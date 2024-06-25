@@ -20,7 +20,7 @@ export function listVariable(...config: AtLeast<ListVariable, 'options'>[]) {
       .map(e => e.icon)
       .filter(isDefined);
 
-    let item: ListVariableOption = {
+    const item: ListVariableOption = {
       value: val,
       name: name.length ? name.reduce((_acc, val) => val) : undefined,
       icon: icon.length ? icon.reduce((_acc, val) => val) : undefined,

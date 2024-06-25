@@ -317,7 +317,7 @@ export const actionList: Record<string, Record<string, ActionItem>> = {
     },
     dock: {
       supported_feature: 4,
-    }
+    },
   },
   light: {
     turn_on: {

@@ -69,7 +69,7 @@ const actionNamesList: Record<string, Record<string, string | actionNameTemplate
   lawn_mower: {
     start_mowing: 'ui.card.lawn_mower.actions.start_mowing',
     pause: 'ui.card.timer.actions.pause',
-    dock: 'ui.card.lawn_mower.actions.dock'
+    dock: 'ui.card.lawn_mower.actions.dock',
   },
   light: {
     turn_on: 'ui.card.vacuum.actions.turn_on',

@@ -19,7 +19,7 @@ function parseString(str: string) {
 
 export function computeActions(entity_id: string | string[], hass: HomeAssistant, config: CardConfig): Action[] {
   if (Array.isArray(entity_id)) {
-    let actions = entity_id.map(e => computeActions(e, hass, config));
+    const actions = entity_id.map(e => computeActions(e, hass, config));
     return computeCommonActions(actions);
   }
 
@@ -59,7 +59,7 @@ export function computeActions(entity_id: string | string[], hass: HomeAssistant
       let res = actions.findIndex(e => compareActions(e, action));
       if (res < 0) {
         //try to find it in unfiltered list of built-in actions
-        let allActions = config.standard_configuration ? standardActions(entity_id, hass, false) : [];
+        const allActions = config.standard_configuration ? standardActions(entity_id, hass, false) : [];
         const match = allActions.find(e => compareActions(e, action));
         if (match) {
           actions = [...actions, match];

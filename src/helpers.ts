@@ -44,7 +44,7 @@ export function flatten<U>(arr: U[][]): U[] {
 }
 
 export function unique<TValue>(arr: TValue[]) {
-  let res: TValue[] = [];
+  const res: TValue[] = [];
   arr.forEach(item => {
     if (!res.find(e => (typeof item === 'object' ? isEqual(e, item) : e === item))) res.push(item);
   });

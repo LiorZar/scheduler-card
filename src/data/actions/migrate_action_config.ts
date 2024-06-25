@@ -13,7 +13,7 @@ export const migrateActionConfig = (
   if (!config) return null;
 
   const action = importAction(config, hass);
-  let match = actions.find(e => compareActions(e, action, true));
+  const match = actions.find(e => compareActions(e, action, true));
 
   if (!match) return null;
 

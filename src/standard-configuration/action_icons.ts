@@ -87,7 +87,7 @@ const actionIcons: IconList = {
   lawn_mower: {
     start_mowing: 'mdi:play',
     pause: 'mdi:pause',
-    dock: 'mdi:home-import-outline'
+    dock: 'mdi:home-import-outline',
   },
   light: {
     turn_on: 'mdi:lightbulb',

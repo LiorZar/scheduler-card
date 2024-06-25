@@ -12,7 +12,7 @@ export function importAction(action: ServiceCall, hass: HomeAssistant): Action {
   const serviceArgs = Object.keys(serviceData);
 
   let actions = standardActions(id, hass, false);
-  let matches = actions.filter(e => compareActions(action, e, true));
+  const matches = actions.filter(e => compareActions(action, e, true));
 
   if (matches.length == 1) actions = matches;
   else {
