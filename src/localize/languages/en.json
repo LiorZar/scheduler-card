@@ -85,13 +85,13 @@
         "day_types_short": {
           "daily": "daily",
           "workdays": "workdays",
-          "weekend": "weekend"
+          "weekend": "weekend",
+          "choose": "choose"
         },
         "day_types_long": {
           "daily": "every day",
           "workdays": "on workdays",
-          "weekend": "in the weekend",
-          "choose": "choose"
+          "weekend": "in the weekend"
         },
         "days": "days",
         "month_types_short": {

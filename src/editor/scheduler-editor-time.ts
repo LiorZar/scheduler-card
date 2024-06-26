@@ -207,10 +207,7 @@ export class SchedulerEditorTime extends LitElement {
             { value: EDayType.Daily, name: localize('ui.components.date.day_types_short.daily', getLocale(this.hass)) },
             { value: EDayType.Workday, name: localize('ui.components.date.day_types_short.workdays', getLocale(this.hass)) },
             { value: EDayType.Weekend, name: localize('ui.components.date.day_types_short.weekend', getLocale(this.hass)) },
-            {
-                value: EDayType.Custom,
-                name: this.hass.localize('ui.components.date.day_types_short.choose', getLocale(this.hass)),
-            },
+            { value: EDayType.Custom, name: localize('ui.components.date.day_types_short.choose', getLocale(this.hass)) },
         ];
         let months = Array.from(Array(12).keys());
         const MonthOptions = months.map(e =>
@@ -219,9 +216,9 @@ export class SchedulerEditorTime extends LitElement {
 
         const MonthTypeOptions = [
             { value: EMonthType.Monthly, name: localize('ui.components.date.month_types_short.monthly', getLocale(this.hass)) },
-            { value: EMonthType.Custom, name: this.hass.localize('ui.components.date.month_types_short.choose', getLocale(this.hass)) },
+            { value: EMonthType.Custom, name: localize('ui.components.date.month_types_short.choose', getLocale(this.hass)) },
         ];
-        console.log("MonthTypeOptions", MonthTypeOptions);
+
         return html`
       <div class="header">${localize('ui.components.date.month_types_short.months', getLocale(this.hass))}</div>
       <button-group .items=${MonthTypeOptions} value=${monthType(this.schedule.months)} @change=${this.selectMonths}>

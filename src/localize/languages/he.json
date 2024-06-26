@@ -85,13 +85,13 @@
         "day_types_short": {
           "daily": "כל יום",
           "workdays": "ימי חול",
-          "weekend": "סוף שבוע"
+          "weekend": "סוף שבוע",
+          "choose": "בחירה מרובה"
         },
         "day_types_long": {
           "daily": "כל יום",
           "workdays": "בימי חול",
-          "weekend": "בסוף השבוע",
-          "choose": "בחירה מרובה"
+          "weekend": "בסוף השבוע"
         },
         "days": "ימים",
         "month_types_short": {
