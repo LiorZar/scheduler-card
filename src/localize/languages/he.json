@@ -90,9 +90,15 @@
         "day_types_long": {
           "daily": "כל יום",
           "workdays": "בימי חול",
-          "weekend": "בסוף השבוע"
+          "weekend": "בסוף השבוע",
+          "choose": "בחירה מרובה"
         },
         "days": "ימים",
+        "month_types_short": {
+          "months": "חודשים",
+          "monthly": "חודשי",
+          "choose": "בחירה מרובה"
+        },
         "tomorrow": "מחר",
         "repeated_days": "בכל {days}",
         "repeated_days_except": "בכל יום פרט ל  {excludedDays}",

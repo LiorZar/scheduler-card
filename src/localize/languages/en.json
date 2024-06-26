@@ -90,9 +90,15 @@
         "day_types_long": {
           "daily": "every day",
           "workdays": "on workdays",
-          "weekend": "in the weekend"
+          "weekend": "in the weekend",
+          "choose": "choose"
         },
         "days": "days",
+        "month_types_short": {
+          "months": "months",
+          "monthly": "monthly",
+          "choose": "choose"
+        },
         "tomorrow": "tomorrow",
         "repeated_days": "every {days}",
         "repeated_days_except": "every day except {excludedDays}",
