@@ -5,7 +5,6 @@ import { terser } from 'rollup-plugin-terser';
 import commonjs from 'rollup-plugin-commonjs';
 import visualizer from 'rollup-plugin-visualizer';
 
-
 const plugins = [
   nodeResolve(),
   commonjs({
@@ -23,7 +22,7 @@ export default [
     output: {
       dir: 'dist',
       format: 'iife',
-      sourcemap: false,
+      sourcemap: true,
     },
     plugins: [...plugins],
     context: 'window',

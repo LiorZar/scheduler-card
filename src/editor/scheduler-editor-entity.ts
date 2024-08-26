@@ -118,6 +118,7 @@ export class SchedulerEditorEntity extends LitElement {
             e => computeDomain(e) !== 'switch' || !this.scheduleEntities.includes(e)
         );
         const groups = entityGroups(entities, this.config, this.hass);
+        groups.push({ name: 'conx', icon: 'mdi:script', entities: ['conx.sk'] });
         groups.sort(sortAlphabetically);
         return groups;
     }
