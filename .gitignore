@@ -3,6 +3,7 @@ package-lock.json
 README.html
 *.DS_Store
 .vscode
+.vs
 ._*
 stats.html
 dist/
