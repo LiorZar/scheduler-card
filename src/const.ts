@@ -13,6 +13,7 @@ export const DeadEntityIcon = 'help-circle-outline';
 export const FieldTemperature = 'temperature';
 export const WorkdaySensor = 'binary_sensor.workday_sensor';
 
+export const ConxDomain = 'conx';
 export const NotifyDomain = 'notify';
 
 export enum ETabOptions {

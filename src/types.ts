@@ -62,7 +62,21 @@ export interface Timeslot {
 }
 
 export type WeekdayType = ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun' | 'workday' | 'weekend' | 'daily')[];
-export type MonthType = ('jan' | 'feb' | 'mar' | 'apr' | 'may' | 'jun' | 'jul' | 'aug' | 'sep' | 'oct' | 'nov' | 'dec' | 'monthly')[];
+export type MonthType = (
+    | 'jan'
+    | 'feb'
+    | 'mar'
+    | 'apr'
+    | 'may'
+    | 'jun'
+    | 'jul'
+    | 'aug'
+    | 'sep'
+    | 'oct'
+    | 'nov'
+    | 'dec'
+    | 'monthly'
+)[];
 
 export interface Schedule {
     schedule_id?: string;

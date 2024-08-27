@@ -118,7 +118,7 @@ export class SchedulerEditorEntity extends LitElement {
             e => computeDomain(e) !== 'switch' || !this.scheduleEntities.includes(e)
         );
         const groups = entityGroups(entities, this.config, this.hass);
-        groups.push({ name: 'conx', icon: 'mdi:script', entities: ['conx.sk'] });
+        groups.push({ name: 'conx', icon: 'mdi:script', entities: ['conx.play_sk', 'conx.cueplay', 'conx.radio_set'] });
         groups.sort(sortAlphabetically);
         return groups;
     }
@@ -383,6 +383,7 @@ export class SchedulerEditorEntity extends LitElement {
     ): Promise<false | { schedule: ScheduleConfig; actions: Action[]; entities: EntityElement[] }> {
         let canMigrate = true;
         let schedule: ScheduleConfig = deepCopy(this.schedule!);
+        if (undefined === selectedAction) selectedAction = null;
 
         const actions = selectedAction !== null ? [selectedAction] : computeActions(entities, this.hass!, this.config!);
 
