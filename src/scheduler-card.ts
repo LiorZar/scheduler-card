@@ -565,6 +565,7 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
 
         let schedule: ScheduleConfig = {
             months: data.months,
+            monthdays: data.monthdays,
             weekdays: data.weekdays,
             timeslots: data.timeslots,
             repeat_type: data.repeat_type,

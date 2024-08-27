@@ -78,9 +78,12 @@ export type MonthType = (
     | 'monthly'
 )[];
 
+export type MonthDaysType = (1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 'all')[]; // 1-31 or 'all'
+;
 export interface Schedule {
     schedule_id?: string;
     months: MonthType;
+    monthdays: MonthDaysType;
     weekdays: WeekdayType;
     timeslots: Timeslot[];
     enabled: boolean;
@@ -96,6 +99,7 @@ export interface Schedule {
 
 export interface ScheduleConfig {
     months: MonthType;
+    monthdays: MonthDaysType;
     weekdays: WeekdayType;
     timeslots: Timeslot[];
     repeat_type: ERepeatType;
@@ -188,6 +192,7 @@ export interface Entry {
     time: Time;
     endTime?: Time;
     months: Months;
+    monthdays: MonthDays;
     days: Days;
     action: string;
     entity: string;
@@ -200,6 +205,7 @@ export interface ImportedEntry {
     time: Time;
     endTime?: Time;
     months: Months;
+    monthdays: MonthDays;
     days: Days;
     actions: number[];
     conditions?: {
@@ -237,6 +243,7 @@ export interface CardConfig extends LovelaceCardConfig {
 export interface HassEntry {
     time?: Time;
     months?: number[];
+    monthdays?: number[];
     days?: number[];
     actions: number[];
     conditions?: {
@@ -286,6 +293,16 @@ export enum EMonthType {
 export interface Months {
     type: EMonthType;
     custom_months?: number[];
+}
+
+export enum EMonthDaysType {
+    All = 'ALL',
+    Custom = 'CUSTOM',
+}
+
+export interface MonthDays {
+    type: EMonthDaysType;
+    custom_monthdays?: number[];
 }
 
 export enum EDayType {

@@ -6,6 +6,7 @@ import {
     CardConfig,
     EntityElement,
     EMonthType,
+    EMonthDaysType,
     EDayType,
     ScheduleConfig,
     Timeslot,
@@ -14,6 +15,7 @@ import {
     ServiceCall,
     ETimeEvent,
     MonthType,
+    MonthDaysType,
 } from '../types';
 import { PrettyPrintIcon, PrettyPrintName, capitalize, sortAlphabetically, omit, isEqual, getLocale } from '../helpers';
 import { DefaultTimeStep, DefaultActionIcon } from '../const';
@@ -21,7 +23,7 @@ import { commonStyle } from '../styles';
 import { computeActionDisplay } from '../data/actions/compute_action_display';
 import { startOfWeek } from '../data/date-time/start_of_week';
 import { monthArray, formatMonth, weekdayArray, formatWeekday } from '../data/date-time/format_weekday';
-import { weekdayType, monthType } from '../data/date-time/weekday_type';
+import { weekdayType, monthType, monthdaysType } from '../data/date-time/weekday_type';
 import { compareActions } from '../data/actions/compare_actions';
 import { assignAction } from '../data/actions/assign_action';
 import { parseRelativeTime, stringToTime } from '../data/date-time/time';
@@ -219,6 +221,16 @@ export class SchedulerEditorTime extends LitElement {
             { value: EMonthType.Custom, name: localize('ui.components.date.month_types_short.choose', getLocale(this.hass)) },
         ];
 
+        let monthdays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+        const MonthDaysOptions = monthdays.map(e =>
+            Object({ value: e, name: e.toString() })
+        );
+
+        const MonthDaysTypeOptions = [
+            { value: EMonthDaysType.All, name: localize('ui.components.date.monthdays_types_short.all', getLocale(this.hass)) },
+            { value: EMonthDaysType.Custom, name: localize('ui.components.date.monthdays_types_short.choose', getLocale(this.hass)) },
+        ];
+
         return html`
       <div class="header">${localize('ui.components.date.month_types_short.months', getLocale(this.hass))}</div>
       <button-group .items=${MonthTypeOptions} value=${monthType(this.schedule.months)} @change=${this.selectMonths}>
@@ -232,6 +244,23 @@ export class SchedulerEditorTime extends LitElement {
                 min="1"
                 multiple
                 @change=${this.selectMonths}
+              >
+              </button-group>
+            </div>
+          `
+                : ''}
+      <div class="header">${localize('ui.components.date.monthdays_types_short.monthdays', getLocale(this.hass))}</div>
+      <button-group .items=${MonthDaysTypeOptions} value=${monthdaysType(this.schedule.monthdays)} @change=${this.selectMonthDays}>
+      </button-group>
+      ${monthdaysType(this.schedule.monthdays) == EMonthDaysType.Custom
+                ? html`
+            <div>
+              <button-group
+                .items=${MonthDaysOptions}
+                .value=${this.schedule.monthdays}
+                min="1"
+                multiple
+                @change=${this.selectMonthDays}
               >
               </button-group>
             </div>
@@ -462,6 +491,26 @@ export class SchedulerEditorTime extends LitElement {
         this.schedule = {
             ...this.schedule,
             months: months,
+        };
+    }
+    selectMonthDays(ev: Event) {
+        const value = (ev.target as HTMLInputElement).value;
+        let monthdays = this.schedule.monthdays;
+        if (Object.values(EMonthDaysType).includes(value as EMonthDaysType)) {
+            switch (value as EMonthDaysType) {
+                case EMonthDaysType.All:
+                    monthdays = ['all'];
+                    break;
+                case EMonthDaysType.Custom:
+                    monthdays = [];
+                    break;
+            }
+        } else {
+            monthdays = (value as unknown) as MonthDaysType;
+        }
+        this.schedule = {
+            ...this.schedule,
+            monthdays: monthdays,
         };
     }
     selectDays(ev: Event) {

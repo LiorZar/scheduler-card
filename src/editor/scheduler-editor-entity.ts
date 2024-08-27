@@ -349,6 +349,7 @@ export class SchedulerEditorEntity extends LitElement {
 
             this.schedule = {
                 months: ['monthly'],
+                monthdays: ['all'],
                 weekdays: ['daily'],
                 timeslots: [defaultTimeslot],
                 repeat_type: ERepeatType.Repeat,
@@ -358,6 +359,7 @@ export class SchedulerEditorEntity extends LitElement {
             this.actions = computeActions(this.entities, this.hass, this.config);
             this.schedule = {
                 months: ['monthly'],
+                monthdays: ['all'],
                 weekdays: ['daily'],
                 timeslots: defaultTimeslots,
                 repeat_type: ERepeatType.Repeat,

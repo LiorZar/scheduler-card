@@ -99,6 +99,11 @@
           "monthly": "monthly",
           "choose": "choose"
         },
+        "monthdays_types_short": {
+          "monthdays": "month days",
+          "all": "all days",
+          "choose": "choose"
+        },
         "tomorrow": "tomorrow",
         "repeated_days": "every {days}",
         "repeated_days_except": "every day except {excludedDays}",

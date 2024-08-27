@@ -99,6 +99,11 @@
           "monthly": "חודשי",
           "choose": "בחירה מרובה"
         },
+        "monthdays_types_short": {
+          "monthdays": "ימים",
+          "all": "תמיד",
+          "choose": "בחירה מרובה"
+        },
         "tomorrow": "מחר",
         "repeated_days": "בכל {days}",
         "repeated_days_except": "בכל יום פרט ל  {excludedDays}",
