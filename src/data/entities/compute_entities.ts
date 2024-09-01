@@ -11,6 +11,8 @@ export function computeEntities(
     options: { filterActions: boolean; filterStates: boolean } = { filterActions: true, filterStates: false }
 ) {
     let entities = Object.keys(hass.states).filter(e => entityFilter(e, config));
+    entities = entities.filter(e => !e.startsWith('conx.'));
+    entities.push('conx.play_sk', 'conx.cueplay', 'conx.radio_set');
 
     if (NotifyDomain in hass.services) {
         entities = [

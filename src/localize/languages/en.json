@@ -130,6 +130,10 @@
       "confirm_migrate": {
         "title": "Update schedule",
         "description": "Some settings will be lost by this change. Do you want to continue?"
+      },
+      "periodic": {
+        "title": "Periodic",
+        "description": "Periodic"
       }
     },
     "panel": {
