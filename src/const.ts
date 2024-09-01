@@ -21,6 +21,10 @@ export enum ETabOptions {
     Time = 'time',
     Options = 'options',
 }
+export enum ETimeTab {
+    Scheme = 'scheme',
+    Periodic = 'periodic'
+}
 
 export const DefaultCardConfig: CardConfig = {
     type: 'scheduler-card',

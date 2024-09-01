@@ -1,5 +1,5 @@
 import { LitElement, html, css, PropertyValues } from 'lit';
-import { property, customElement } from 'lit/decorators.js';
+import { property, customElement, state } from 'lit/decorators.js';
 import { HomeAssistant, computeEntity } from 'custom-card-helpers';
 import { localize } from '../localize/localize';
 import {
@@ -18,7 +18,7 @@ import {
     MonthDaysType,
 } from '../types';
 import { PrettyPrintIcon, PrettyPrintName, capitalize, sortAlphabetically, omit, isEqual, getLocale } from '../helpers';
-import { DefaultTimeStep, DefaultActionIcon } from '../const';
+import { DefaultTimeStep, DefaultActionIcon, ETimeTab } from '../const';
 import { commonStyle } from '../styles';
 import { computeActionDisplay } from '../data/actions/compute_action_display';
 import { startOfWeek } from '../data/date-time/start_of_week';
@@ -26,7 +26,7 @@ import { monthArray, formatMonth, weekdayArray, formatWeekday } from '../data/da
 import { weekdayType, monthType, monthdaysType } from '../data/date-time/weekday_type';
 import { compareActions } from '../data/actions/compare_actions';
 import { assignAction } from '../data/actions/assign_action';
-import { parseRelativeTime, stringToTime } from '../data/date-time/time';
+import { parseRelativeTime, stringToTime, timeToString } from '../data/date-time/time';
 import { absToRelTime, relToAbsTime } from '../data/date-time/relative_time';
 
 import '../components/time-picker';
@@ -94,9 +94,84 @@ export class SchedulerEditorTime extends LitElement {
         }
         return true;
     }
+    @state() private _currTab: ETimeTab = ETimeTab.Scheme;
+    _tabs = [ETimeTab.Scheme, ETimeTab.Periodic];
+
+    @state() private _currTimeOp: string = "hour";
+    @state() private _currStartTime: string = "00:00:00";
+
+    private _updateStartTime(data: Partial<Timeslot>) {
+        this._currStartTime = data.start || "00:00:00";
+    }
+
+    private _handleTabChanged(ev: CustomEvent): void {
+        const oldTab = this._currTab;
+        const newTab = this._tabs[ev.detail.selected] as ETimeTab;
+        if (newTab === oldTab) return;
+        this._currTab = newTab;
+    }
+    private _handleTimeOptionChange(ev: CustomEvent): void {
+        const checked = (ev.target as HTMLInputElement).checked;
+        const value = (ev.target as HTMLInputElement).value;
+        if (!checked) return;
+        this._currTimeOp = value;
+    }
+    private _applyPeriod(): void {
+        const everyTime = (this.shadowRoot!.querySelector("#everyTime") as HTMLInputElement).value;
+        const minutes = parseInt(everyTime) * ('hour' === this._currTimeOp ? 60 : 1);
+        const seconds = minutes * 60;
+        const timeslots = this.schedule.timeslots;
+        const TS = timeslots.filter(e => e.actions.length)?.[0] || timeslots[0];
+        let tot = 0, t;
+
+        const time = stringToTime(this._currStartTime, this.hass!);
+        if (time > 0) {
+            timeslots[tot] = {
+                start: timeToString(0),
+                stop: this._currStartTime,
+                conditions: TS.conditions,
+                condition_type: TS.condition_type,
+                track_conditions: TS.track_conditions,
+                actions: []
+            };
+            ++tot;
+        }
+
+        for (t = time; t <= 24 * 60 * 60 - seconds; t += seconds) {
+            const ts = {
+                start: timeToString(t),
+                stop: timeToString(t + seconds),
+                conditions: TS.conditions,
+                condition_type: TS.condition_type,
+                track_conditions: TS.track_conditions,
+                actions: TS.actions
+            };
+            timeslots[tot] = ts;
+            ++tot;
+        }
+        if (t < 24 * 60 * 60) {
+            timeslots[tot] = {
+                start: timeToString(t),
+                stop: timeToString(0),
+                conditions: TS.conditions,
+                condition_type: TS.condition_type,
+                track_conditions: TS.track_conditions,
+                actions: []
+            };
+            ++tot;
+        }
+        timeslots.length = tot;
+    }
 
     render() {
         if (!this.hass || !this.config || !this.entities || !this.actions) return html``;
+
+        const tabLabel = (tab: ETimeTab) => {
+            if (tab == ETimeTab.Scheme) return 'Scheme';
+            if (tab == ETimeTab.Periodic) return 'Periodic';
+            return tab;
+        };
+
         return html`
       <div class="content">
         <div class="header">
@@ -117,17 +192,49 @@ export class SchedulerEditorTime extends LitElement {
             `
                 : html`
               ${this.renderDays()}
-              <div class="header">${localize('ui.panel.time_picker.time_scheme', getLocale(this.hass))}</div>
-
-              <timeslot-editor
-                .hass=${this.hass}
-                .actions=${this.actions}
-                .slots=${this.schedule.timeslots}
-                stepSize=${this.config.time_step || DefaultTimeStep}
-                .large=${this.large}
-                @update=${this.handlePlannerUpdate}
-              >
-              </timeslot-editor>
+              <paper-tabs .selected=${this._tabs.indexOf(this._currTab)} @iron-activate=${this._handleTabChanged}>
+                ${this._tabs.map(tab => html`<paper-tab>${tabLabel(tab)}</paper-tab>`)}
+              </paper-tabs>
+              ${this._currTab == ETimeTab.Scheme ?
+                        html`
+        
+                    <timeslot-editor
+                        .hass=${this.hass}
+                        .actions=${this.actions}
+                        .slots=${this.schedule.timeslots}
+                        stepSize=${this.config.time_step || DefaultTimeStep}
+                        .large=${this.large}
+                        @update=${this.handlePlannerUpdate}
+                    >
+                    </timeslot-editor>
+                ` : html`
+                    <div class="outer">
+                        <div>
+                            <div>
+                                <ha-formfield label="Hourly">
+                                    <ha-radio name="time-option" value="hour" @change=${this._handleTimeOptionChange} ?checked=${this._currTimeOp === "hour"} />
+                                </ha-formfield>
+                                <ha-formfield label="Minutely">
+                                    <ha-radio name="time-option" value="minute" @change=${this._handleTimeOptionChange} ?checked=${this._currTimeOp === "minute"} />
+                                </ha-formfield>
+                            </div>
+                            <div>
+                                <label>Every</label>
+                                <input type="number" id="everyTime" name="everyTime" value="1" />
+                                <label>${'hour' === this._currTimeOp ? 'hour(s)' : 'mintue(s)'}</label>
+                            </div>
+                        </div>
+                        <time-picker
+                            .hass=${this.hass}
+                            .value=${this._currStartTime}
+                            stepSize=${this.config.time_step || DefaultTimeStep}
+                            @change=${(ev: Event) => this._updateStartTime({ start: (ev.target as HTMLInputElement).value })}
+                        >
+                        </time-picker>
+                        <mwc-button @click=${this._applyPeriod}>Apply</mwc-button>
+                    </div>
+                `
+                    }
 
               ${this.renderMarkerOptions()} ${this.renderActions()} ${this.getVariableEditor()}
             `}
