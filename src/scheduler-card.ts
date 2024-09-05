@@ -16,8 +16,8 @@ import {
 } from './helpers';
 import { ValidateConfig } from './config-validation';
 import { parseEntity } from './data/entities/parse_entity';
-import { deleteSchedule, fetchScheduleItem, fetchSchedules, handleError } from './data/websockets';
-import { computeActions } from './data/actions/compute_actions';
+import { deleteSchedule, fetchSK, fetchScheduleItem, fetchSchedules, handleError } from './data/websockets';
+import { SKData, computeActions } from './data/actions/compute_actions';
 import { compareActions } from './data/actions/compare_actions';
 import { importAction } from './data/actions/import_action';
 import { entityFilter } from './data/entities/entity_filter';
@@ -190,6 +190,7 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
 
     public hassSubscribe(): Promise<UnsubscribeFunc>[] {
         this.loadSchedules();
+        this.loadSK();
         return [
             this.hass!.connection.subscribeMessage((ev: SchedulerEventData) => this.updateScheduleItem(ev), {
                 type: WebsocketEvent,
@@ -270,6 +271,22 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
                 this.connectionError = true;
             });
     }
+    private async loadSK(): Promise<void> {
+        //load all sk
+        let path: string = this._config?.sk_path || 'sk';
+        if ("sk" !== path.substr(0, 2))
+            path = "sk/" + path;
+
+        fetchSK(this.hass!, path)
+            .then((respond: any) => {
+                SKData.Process(respond);
+            }, (_error: any) => {
+                SKData.Process({});
+            })
+            .catch(_e => {
+                SKData.Process({});
+            });
+    }
 
     protected shouldUpdate(changedProps: PropertyValues): boolean {
         const oldHass = changedProps.get('hass') as HomeAssistant | undefined;
@@ -281,8 +298,10 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
         }
         if (oldConfig && this._config) {
             const changedKeys = Object.keys(oldConfig).filter(e => oldConfig[e] !== this._config![e]);
-            if (changedKeys.some(e => ['tags', 'discover_existing', 'sort_by', 'display_options'].includes(e)))
+            if (changedKeys.some(e => ['tags', 'discover_existing', 'sort_by', 'display_options'].includes(e))) {
                 (async () => await this.loadSchedules())();
+                (async () => await this.loadSK())();
+            }
         }
         if (oldHass && changedProps.size == 1 && this.schedules)
             return this.schedules!.some(
@@ -640,6 +659,7 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
     _retryConnection() {
         setTimeout(async () => {
             await this.loadSchedules();
+            await this.loadSK();
         }, 100);
         this.connectionError = false;
         this.requestUpdate();

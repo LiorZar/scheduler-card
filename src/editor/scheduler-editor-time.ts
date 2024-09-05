@@ -167,8 +167,8 @@ export class SchedulerEditorTime extends LitElement {
         if (!this.hass || !this.config || !this.entities || !this.actions) return html``;
 
         const tabLabel = (tab: ETimeTab) => {
-            if (tab == ETimeTab.Scheme) return 'Scheme';
-            if (tab == ETimeTab.Periodic) return 'Periodic';
+            if (tab == ETimeTab.Scheme) return localize('ui.panel.time_picker.time_scheme', getLocale(this.hass!));
+            if (tab == ETimeTab.Periodic) return localize('ui.panel.time_picker.time_periodic', getLocale(this.hass!));
             return tab;
         };
 
@@ -211,17 +211,17 @@ export class SchedulerEditorTime extends LitElement {
                     <div class="outer">
                         <div>
                             <div>
-                                <ha-formfield label="Hourly">
+                                <ha-formfield label=${localize('ui.panel.time_picker.hourly', getLocale(this.hass))}>
                                     <ha-radio name="time-option" value="hour" @change=${this._handleTimeOptionChange} ?checked=${this._currTimeOp === "hour"} />
                                 </ha-formfield>
-                                <ha-formfield label="Minutely">
+                                <ha-formfield label=${localize('ui.panel.time_picker.minutely', getLocale(this.hass))}>
                                     <ha-radio name="time-option" value="minute" @change=${this._handleTimeOptionChange} ?checked=${this._currTimeOp === "minute"} />
                                 </ha-formfield>
                             </div>
                             <div>
                                 <label>Every</label>
                                 <input type="number" id="everyTime" name="everyTime" value="1" />
-                                <label>${'hour' === this._currTimeOp ? 'hour(s)' : 'mintue(s)'}</label>
+                                <label>${'hour' === this._currTimeOp ? localize('ui.panel.time_picker.hours', getLocale(this.hass)) : localize('ui.panel.time_picker.minutes', getLocale(this.hass))}</label>
                             </div>
                         </div>
                         <time-picker

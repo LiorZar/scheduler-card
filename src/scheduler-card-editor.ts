@@ -18,42 +18,42 @@ import { entityFilter } from './data/entities/entity_filter';
 
 @customElement('scheduler-card-editor')
 export class SchedulerCardEditor extends LitElement implements LovelaceCardEditor {
-  @property()
-  public hass?: HomeAssistant;
+    @property()
+    public hass?: HomeAssistant;
 
-  @property()
-  private _config?: CardConfig;
+    @property()
+    private _config?: CardConfig;
 
-  @property()
-  scheduleEntities: string[] = [];
+    @property()
+    scheduleEntities: string[] = [];
 
-  @property()
-  tagOptions?: string[];
+    @property()
+    tagOptions?: string[];
 
-  @state()
-  private _cardTab = false;
+    @state()
+    private _cardTab = false;
 
-  @property()
-  selectedDomain = '';
+    @property()
+    selectedDomain = '';
 
-  public setConfig(config: LovelaceCardConfig | CardConfig): void {
-    this._config = config as CardConfig;
-  }
-
-  async firstUpdated() {
-    await loadHaForm();
-    this.scheduleEntities = (await fetchSchedules(this.hass!)).map(e => e.entity_id);
-    const tagOptions = (await fetchTags(this.hass!)).map(e => e.name);
-    tagOptions.sort(sortAlphabetically);
-    this.tagOptions = tagOptions;
-  }
-
-  protected render(): TemplateResult | void {
-    if (!this.hass || !this._config) {
-      return html``;
+    public setConfig(config: LovelaceCardConfig | CardConfig): void {
+        this._config = config as CardConfig;
     }
 
-    return html`
+    async firstUpdated() {
+        await loadHaForm();
+        this.scheduleEntities = (await fetchSchedules(this.hass!)).map(e => e.entity_id);
+        const tagOptions = (await fetchTags(this.hass!)).map(e => e.name);
+        tagOptions.sort(sortAlphabetically);
+        this.tagOptions = tagOptions;
+    }
+
+    protected render(): TemplateResult | void {
+        if (!this.hass || !this._config) {
+            return html``;
+        }
+
+        return html`
       <paper-tabs .selected=${this._cardTab ? 1 : 0} @iron-activate=${this._selectTab}>
         <paper-tab>${localize('ui.panel.card_editor.tabs.entities', getLocale(this.hass))}</paper-tab>
         <paper-tab>${localize('ui.panel.card_editor.tabs.other', getLocale(this.hass))}</paper-tab>
@@ -61,7 +61,7 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
 
       <div class="card-config">
         ${!this._cardTab
-          ? html`
+                ? html`
               <div class="header">
                 ${localize('ui.panel.card_editor.fields.entities.heading', getLocale(this.hass))}
               </div>
@@ -70,38 +70,45 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
               </div>
               ${this.getDomainSwitches()}
             `
-          : html`
+                : html`
+              <ha-textfield
+                      label=${localize('ui.panel.card_editor.fields.sk_path', getLocale(this.hass))}
+                      .value=${this._config.sk_path || 'sk'}
+                      @input=${(ev: Event) => {
+                        this._updateConfig({ sk_path: String((ev.target as HTMLInputElement).value) });
+                    }}
+                    ></ha-textfield>
               <div class="header">${localize('ui.panel.card_editor.fields.title.heading', getLocale(this.hass))}</div>
               <button-group
                 .items=${[
-                  {
-                    name: localize('ui.panel.card_editor.fields.title.options.standard', getLocale(this.hass)),
-                    value: 'standard',
-                  },
-                  {
-                    name: localize('ui.panel.card_editor.fields.title.options.hidden', getLocale(this.hass)),
-                    value: 'hidden',
-                  },
-                  {
-                    name: localize('ui.panel.card_editor.fields.title.options.custom', getLocale(this.hass)),
-                    value: 'custom',
-                  },
-                ]}
+                        {
+                            name: localize('ui.panel.card_editor.fields.title.options.standard', getLocale(this.hass)),
+                            value: 'standard',
+                        },
+                        {
+                            name: localize('ui.panel.card_editor.fields.title.options.hidden', getLocale(this.hass)),
+                            value: 'hidden',
+                        },
+                        {
+                            name: localize('ui.panel.card_editor.fields.title.options.custom', getLocale(this.hass)),
+                            value: 'custom',
+                        },
+                    ]}
                 value=${this.getTitleOption()}
                 @change=${(ev: Event) => this._setTitleFormatOption((ev.target as HTMLInputElement).value)}
               >
               </button-group>
               ${typeof this._config.title == 'string'
-                ? html`
+                        ? html`
                     <ha-textfield
                       label=${localize('ui.panel.card_editor.fields.title.custom_title', getLocale(this.hass))}
                       .value=${this._config.title}
                       @input=${(ev: Event) => {
-                        this._updateConfig({ title: String((ev.target as HTMLInputElement).value) });
-                      }}
+                                this._updateConfig({ title: String((ev.target as HTMLInputElement).value) });
+                            }}
                     ></ha-textfield>
                   `
-                : ''}
+                        : ''}
 
               <div class="header">
                 ${localize('ui.panel.card_editor.fields.discover_existing.heading', getLocale(this.hass))}
@@ -112,8 +119,8 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
               <ha-switch
                 ?checked=${this._config.discover_existing !== false}
                 @change=${(ev: Event) => {
-                  this._updateConfig({ discover_existing: (ev.target as HTMLInputElement).checked });
-                }}
+                        this._updateConfig({ discover_existing: (ev.target as HTMLInputElement).checked });
+                    }}
               >
               </ha-switch>
 
@@ -132,8 +139,8 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
                 ?optional=${false}
                 ?disabled=${false}
                 @value-changed=${(ev: CustomEvent) => {
-                  this._updateConfig({ time_step: Number(ev.detail.value) });
-                }}
+                        this._updateConfig({ time_step: Number(ev.detail.value) });
+                    }}
               >
               </variable-slider>
 
@@ -188,9 +195,9 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
 
               <ha-formfield
                 label=${localize(
-                  'ui.panel.card_editor.fields.display_format_primary.options.default',
-                  getLocale(this.hass)
-                )}
+                        'ui.panel.card_editor.fields.display_format_primary.options.default',
+                        getLocale(this.hass)
+                    )}
               >
                 <ha-radio
                   name="primary_info"
@@ -202,9 +209,9 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
               </ha-formfield>
               <ha-formfield
                 label=${localize(
-                  'ui.panel.card_editor.fields.display_format_primary.options.entity_action',
-                  getLocale(this.hass)
-                )}
+                        'ui.panel.card_editor.fields.display_format_primary.options.entity_action',
+                        getLocale(this.hass)
+                    )}
               >
                 <ha-radio
                   name="primary_info"
@@ -224,14 +231,14 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
 
               <ha-formfield
                 label=${localize(
-                  'ui.panel.card_editor.fields.display_format_secondary.options.relative_time',
-                  getLocale(this.hass)
-                )}
+                        'ui.panel.card_editor.fields.display_format_secondary.options.relative_time',
+                        getLocale(this.hass)
+                    )}
               >
                 <ha-checkbox
                   ?checked=${AsArray(
-                    (this._config.display_options || DefaultCardConfig.display_options).secondary_info
-                  ).includes('relative-time')}
+                        (this._config.display_options || DefaultCardConfig.display_options).secondary_info
+                    ).includes('relative-time')}
                   value="relative-time"
                   @change=${this._setDisplayOptionsSecondary}
                 ></ha-checkbox>
@@ -239,14 +246,14 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
 
               <ha-formfield
                 label=${localize(
-                  'ui.panel.card_editor.fields.display_format_secondary.options.time',
-                  getLocale(this.hass)
-                )}
+                        'ui.panel.card_editor.fields.display_format_secondary.options.time',
+                        getLocale(this.hass)
+                    )}
               >
                 <ha-checkbox
                   ?checked=${AsArray(
-                    (this._config.display_options || DefaultCardConfig.display_options).secondary_info
-                  ).includes('time')}
+                        (this._config.display_options || DefaultCardConfig.display_options).secondary_info
+                    ).includes('time')}
                   value="time"
                   @change=${this._setDisplayOptionsSecondary}
                 ></ha-checkbox>
@@ -254,14 +261,14 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
 
               <ha-formfield
                 label=${localize(
-                  'ui.panel.card_editor.fields.display_format_secondary.options.days',
-                  getLocale(this.hass)
-                )}
+                        'ui.panel.card_editor.fields.display_format_secondary.options.days',
+                        getLocale(this.hass)
+                    )}
               >
                 <ha-checkbox
                   ?checked=${AsArray(
-                    (this._config.display_options || DefaultCardConfig.display_options).secondary_info
-                  ).includes('days')}
+                        (this._config.display_options || DefaultCardConfig.display_options).secondary_info
+                    ).includes('days')}
                   value="days"
                   @change=${this._setDisplayOptionsSecondary}
                 ></ha-checkbox>
@@ -269,14 +276,14 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
 
               <ha-formfield
                 label=${localize(
-                  'ui.panel.card_editor.fields.display_format_secondary.options.additional_tasks',
-                  getLocale(this.hass)
-                )}
+                        'ui.panel.card_editor.fields.display_format_secondary.options.additional_tasks',
+                        getLocale(this.hass)
+                    )}
               >
                 <ha-checkbox
                   ?checked=${AsArray(
-                    (this._config.display_options || DefaultCardConfig.display_options).secondary_info
-                  ).includes('additional-tasks')}
+                        (this._config.display_options || DefaultCardConfig.display_options).secondary_info
+                    ).includes('additional-tasks')}
                   value="additional-tasks"
                   @change=${this._setDisplayOptionsSecondary}
                 ></ha-checkbox>
@@ -291,13 +298,13 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
               <ha-switch
                 ?checked=${this._config.show_header_toggle}
                 @change=${(ev: Event) => {
-                  this._updateConfig({ show_header_toggle: (ev.target as HTMLInputElement).checked });
-                }}
+                        this._updateConfig({ show_header_toggle: (ev.target as HTMLInputElement).checked });
+                    }}
               >
               </ha-switch>
 
               ${this.tagOptions !== undefined
-                ? html`
+                        ? html`
                     <div class="header">
                       ${localize('ui.panel.card_editor.fields.tags.heading', getLocale(this.hass))}
                     </div>
@@ -312,125 +319,125 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
                     >
                     </scheduler-selector>
                   `
-                : ''}
+                        : ''}
             `}
       </div>
     `;
-  }
-
-  private _selectTab(ev: CustomEvent): void {
-    this._cardTab = ev.detail.selected === 1;
-  }
-
-  private _updateConfig(changes: Partial<CardConfig>) {
-    if (!this._config) return;
-    this._config = { ...this._config, ...changes };
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  private _setTitleFormatOption(option: string) {
-    if (!this.hass) return;
-    if (option == 'standard') this._updateConfig({ title: true });
-    else if (option == 'hidden') this._updateConfig({ title: false });
-    else
-      this._updateConfig({
-        title:
-          typeof this._config?.title === 'string'
-            ? this._config.title
-            : localize('ui.panel.common.title', getLocale(this.hass)),
-      });
-  }
-
-  private getTitleOption() {
-    if (!this.hass || !this._config) return '';
-    if (typeof this._config.title == 'string') return 'custom';
-    return this._config.title ? 'standard' : 'hidden';
-  }
-
-  private updateTags(ev: Event) {
-    if (!this._config || !this.hass) return;
-    let value = ((ev.target as HTMLInputElement).value as unknown) as string[];
-    value = value.map(e => e.trim());
-    value.sort(sortAlphabetically);
-    this._updateConfig({ tags: value });
-  }
-
-  getTagOptions() {
-    if (!this._config || !this.hass) return [];
-    let options = this.tagOptions || [];
-    if (this._config.tags) {
-      const configTags = AsArray(this._config.tags);
-      options = [...options, ...configTags.filter(e => !options.includes(e))];
     }
-    return options.map(e => Object({ name: e, value: e }));
-  }
 
-  private _setSortBy(ev: Event) {
-    const checked = (ev.target as HTMLInputElement).checked;
-    const value = (ev.target as HTMLInputElement).value;
-    let config = AsArray(this._config?.sort_by || DefaultCardConfig.sort_by);
-    if (value != 'state' && checked) config = config.filter(e => e == 'state');
-    if (!config.includes(value) && checked) config = [...config, value];
-    if (config.includes(value) && !checked) config = config.filter(e => e != value);
-    this._updateConfig({ sort_by: config });
-  }
+    private _selectTab(ev: CustomEvent): void {
+        this._cardTab = ev.detail.selected === 1;
+    }
 
-  private _setDisplayOptionsPrimary(ev: Event) {
-    const value = (ev.target as HTMLInputElement).value;
-    const displayOptions = {
-      ...(this._config?.display_options || DefaultCardConfig.display_options),
-      primary_info: value,
-    };
-    this._updateConfig({ display_options: displayOptions });
-  }
+    private _updateConfig(changes: Partial<CardConfig>) {
+        if (!this._config) return;
+        this._config = { ...this._config, ...changes };
+        fireEvent(this, 'config-changed', { config: this._config });
+    }
 
-  private _setDisplayOptionsSecondary(ev: Event) {
-    const value = (ev.target as HTMLInputElement).value;
-    const checked = (ev.target as HTMLInputElement).checked;
-    let displayOptions = {
-      ...(this._config?.display_options || DefaultCardConfig.display_options),
-    };
-    let secondaryInfo = AsArray(displayOptions.secondary_info || []);
-    secondaryInfo = checked ? Array.from(new Set([...secondaryInfo, value])) : secondaryInfo.filter(e => e !== value);
-    secondaryInfo.sort((a, b) => {
-      const ranking = {
-        'relative-time': 1,
-        time: secondaryInfo.includes('relative-time') ? 3 : 2,
-        days: secondaryInfo.includes('relative-time') ? 2 : 3,
-        'additional-tasks': 4,
-      };
-      const rankA = Object.keys(ranking).includes(a) ? ranking[a] : 5;
-      const rankB = Object.keys(ranking).includes(b) ? ranking[b] : 5;
-      if (rankA > rankB) return 1;
-      if (rankA < rankB) return -1;
-      return 0;
-    });
-    displayOptions = { ...displayOptions, secondary_info: [...secondaryInfo] };
-    this._updateConfig({ display_options: displayOptions });
-  }
+    private _setTitleFormatOption(option: string) {
+        if (!this.hass) return;
+        if (option == 'standard') this._updateConfig({ title: true });
+        else if (option == 'hidden') this._updateConfig({ title: false });
+        else
+            this._updateConfig({
+                title:
+                    typeof this._config?.title === 'string'
+                        ? this._config.title
+                        : localize('ui.panel.common.title', getLocale(this.hass)),
+            });
+    }
 
-  getDomainSwitches() {
-    if (!this._config || !this.hass) return;
+    private getTitleOption() {
+        if (!this.hass || !this._config) return '';
+        if (typeof this._config.title == 'string') return 'custom';
+        return this._config.title ? 'standard' : 'hidden';
+    }
 
-    const entities = computeEntities(
-      this.hass,
-      { ...DefaultCardConfig, include: ['*'] },
-      { filterActions: true, filterStates: true }
-    )
-      .filter(e => computeDomain(e) !== 'switch' || !this.scheduleEntities.includes(e))
-      .map(e => parseEntity(e, this.hass!, { include: ['*'] }))
-      .filter(e => standardStates(e.id, this.hass!) || computeActions(e.id, this.hass!, DefaultCardConfig));
+    private updateTags(ev: Event) {
+        if (!this._config || !this.hass) return;
+        let value = ((ev.target as HTMLInputElement).value as unknown) as string[];
+        value = value.map(e => e.trim());
+        value.sort(sortAlphabetically);
+        this._updateConfig({ tags: value });
+    }
 
-    const domainList = entities.map(e => computeDomain(e.id)).filter((v, k, arr) => arr.indexOf(v) === k);
-    domainList.sort((a, b) => (a.trim().toLowerCase() < b.trim().toLowerCase() ? -1 : 1));
+    getTagOptions() {
+        if (!this._config || !this.hass) return [];
+        let options = this.tagOptions || [];
+        if (this._config.tags) {
+            const configTags = AsArray(this._config.tags);
+            options = [...options, ...configTags.filter(e => !options.includes(e))];
+        }
+        return options.map(e => Object({ name: e, value: e }));
+    }
 
-    return domainList.map(domain => {
-      const count = entities.filter(e => computeDomain(e.id) == domain).length;
-      const domainEntities = entities.filter(e => computeDomain(e.id) == domain);
-      const includedCount = domainEntities.filter(e => entityFilter(e.id, this._config!)).length;
+    private _setSortBy(ev: Event) {
+        const checked = (ev.target as HTMLInputElement).checked;
+        const value = (ev.target as HTMLInputElement).value;
+        let config = AsArray(this._config?.sort_by || DefaultCardConfig.sort_by);
+        if (value != 'state' && checked) config = config.filter(e => e == 'state');
+        if (!config.includes(value) && checked) config = [...config, value];
+        if (config.includes(value) && !checked) config = config.filter(e => e != value);
+        this._updateConfig({ sort_by: config });
+    }
 
-      if (!count) return ``;
-      return html`
+    private _setDisplayOptionsPrimary(ev: Event) {
+        const value = (ev.target as HTMLInputElement).value;
+        const displayOptions = {
+            ...(this._config?.display_options || DefaultCardConfig.display_options),
+            primary_info: value,
+        };
+        this._updateConfig({ display_options: displayOptions });
+    }
+
+    private _setDisplayOptionsSecondary(ev: Event) {
+        const value = (ev.target as HTMLInputElement).value;
+        const checked = (ev.target as HTMLInputElement).checked;
+        let displayOptions = {
+            ...(this._config?.display_options || DefaultCardConfig.display_options),
+        };
+        let secondaryInfo = AsArray(displayOptions.secondary_info || []);
+        secondaryInfo = checked ? Array.from(new Set([...secondaryInfo, value])) : secondaryInfo.filter(e => e !== value);
+        secondaryInfo.sort((a, b) => {
+            const ranking = {
+                'relative-time': 1,
+                time: secondaryInfo.includes('relative-time') ? 3 : 2,
+                days: secondaryInfo.includes('relative-time') ? 2 : 3,
+                'additional-tasks': 4,
+            };
+            const rankA = Object.keys(ranking).includes(a) ? ranking[a] : 5;
+            const rankB = Object.keys(ranking).includes(b) ? ranking[b] : 5;
+            if (rankA > rankB) return 1;
+            if (rankA < rankB) return -1;
+            return 0;
+        });
+        displayOptions = { ...displayOptions, secondary_info: [...secondaryInfo] };
+        this._updateConfig({ display_options: displayOptions });
+    }
+
+    getDomainSwitches() {
+        if (!this._config || !this.hass) return;
+
+        const entities = computeEntities(
+            this.hass,
+            { ...DefaultCardConfig, include: ['*'] },
+            { filterActions: true, filterStates: true }
+        )
+            .filter(e => computeDomain(e) !== 'switch' || !this.scheduleEntities.includes(e))
+            .map(e => parseEntity(e, this.hass!, { include: ['*'] }))
+            .filter(e => standardStates(e.id, this.hass!) || computeActions(e.id, this.hass!, DefaultCardConfig));
+
+        const domainList = entities.map(e => computeDomain(e.id)).filter((v, k, arr) => arr.indexOf(v) === k);
+        domainList.sort((a, b) => (a.trim().toLowerCase() < b.trim().toLowerCase() ? -1 : 1));
+
+        return domainList.map(domain => {
+            const count = entities.filter(e => computeDomain(e.id) == domain).length;
+            const domainEntities = entities.filter(e => computeDomain(e.id) == domain);
+            const includedCount = domainEntities.filter(e => entityFilter(e.id, this._config!)).length;
+
+            if (!count) return ``;
+            return html`
         <div class="row" @click=${() => this.toggleShowDomain(domain)}>
           <ha-icon icon="${PrettyPrintIcon(domainIcons[domain])}"> </ha-icon>
 
@@ -442,7 +449,7 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
                 getLocale(this.hass!),
                 ['{number}', '{total}'],
                 [includedCount, count]
-              )}
+            )}
             </div>
           </div>
           <ha-switch
@@ -454,10 +461,10 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
           </ha-switch>
         </div>
         ${this.selectedDomain == domain
-          ? html`
+                    ? html`
               <div class="divider"></div>
               ${domainEntities.map(entity => {
-                return html`
+                        return html`
                   <div class="row" @click=${() => this.toggleSelectEntity(entity.id)}>
                     <ha-icon icon="${entity.icon}"></ha-icon>
                     <div class="info">
@@ -469,56 +476,56 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
                     <ha-switch
                       ?checked=${entityFilter(entity.id, this._config!)}
                       ?disabled=${entityFilter(entity.id, { groups: this._config?.groups }) ||
-                        entityFilter(domain, { groups: this._config?.groups })}
+                            entityFilter(domain, { groups: this._config?.groups })}
                     ></ha-switch>
                   </div>
                 `;
-              })}
+                    })}
               <div class="divider"></div>
             `
-          : ''}
+                    : ''}
       `;
-    });
-  }
-
-  toggleShowDomain(domain: string) {
-    if (!this._config || !this.hass) return;
-    if (this.selectedDomain != domain) {
-      this.selectedDomain = domain;
-    } else {
-      this.selectedDomain = '';
+        });
     }
-  }
 
-  toggleSelectEntity(entity_id: string, newValue?: boolean) {
-    if (!this._config || !this.hass) return;
-    const isIncluded = entityFilter(entity_id, this._config);
-    if (newValue === undefined) newValue = !isIncluded;
-    const entityDomain = computeDomain(entity_id);
+    toggleShowDomain(domain: string) {
+        if (!this._config || !this.hass) return;
+        if (this.selectedDomain != domain) {
+            this.selectedDomain = domain;
+        } else {
+            this.selectedDomain = '';
+        }
+    }
 
-    let include = [...(this._config.include || [])];
-    let exclude = [...(this._config.exclude || [])];
+    toggleSelectEntity(entity_id: string, newValue?: boolean) {
+        if (!this._config || !this.hass) return;
+        const isIncluded = entityFilter(entity_id, this._config);
+        if (newValue === undefined) newValue = !isIncluded;
+        const entityDomain = computeDomain(entity_id);
 
-    if (!isIncluded && newValue) {
-      if (exclude.includes(entity_id)) exclude = exclude.filter(e => e != entity_id);
-      if (!include.includes(entity_id)) include = [...include, entity_id];
-    } else if (isIncluded && !newValue) {
-      if (
-        (entityDomain && include.includes(entityDomain)) ||
-        entityFilter(entity_id, { customize: this._config.customize }) ||
-        (entityDomain && entityFilter(entityDomain, { customize: this._config.customize }))
-      )
-        exclude = [...exclude, entity_id];
-      if (include.includes(entity_id)) include = include.filter(e => e != entity_id);
-    } else return;
+        let include = [...(this._config.include || [])];
+        let exclude = [...(this._config.exclude || [])];
 
-    include.sort(sortAlphabetically);
-    exclude.sort(sortAlphabetically);
-    this._updateConfig({ include: include, exclude: exclude });
-  }
+        if (!isIncluded && newValue) {
+            if (exclude.includes(entity_id)) exclude = exclude.filter(e => e != entity_id);
+            if (!include.includes(entity_id)) include = [...include, entity_id];
+        } else if (isIncluded && !newValue) {
+            if (
+                (entityDomain && include.includes(entityDomain)) ||
+                entityFilter(entity_id, { customize: this._config.customize }) ||
+                (entityDomain && entityFilter(entityDomain, { customize: this._config.customize }))
+            )
+                exclude = [...exclude, entity_id];
+            if (include.includes(entity_id)) include = include.filter(e => e != entity_id);
+        } else return;
 
-  static get styles(): CSSResultGroup {
-    return css`
+        include.sort(sortAlphabetically);
+        exclude.sort(sortAlphabetically);
+        this._updateConfig({ include: include, exclude: exclude });
+    }
+
+    static get styles(): CSSResultGroup {
+        return css`
       ${commonStyle}
 
       paper-tabs {
@@ -569,5 +576,5 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
         width: 100%;
       }
     `;
-  }
+    }
 }

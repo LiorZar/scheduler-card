@@ -236,6 +236,7 @@ export interface CardConfig extends LovelaceCardConfig {
     tags?: string[] | string;
     exclude_tags?: string[] | string;
     sort_by: string[] | string;
+    sk_path?: string;
 }
 
 /* interface */

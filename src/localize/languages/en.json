@@ -161,6 +161,11 @@
       "time_picker": {
         "no_timeslot_selected": "Select a timeslot first",
         "time_scheme": "Scheme",
+        "time_periodic": "Periodic",
+        "hourly": "Hourly",
+        "minutely": "Minutely",
+        "hours": "Hour(s)",
+        "minutes": "Minute(s)",
         "time_input_mode": "Time control mode"
       },
       "conditions": {
@@ -181,6 +186,7 @@
           "other": "Other"
         },
         "fields": {
+          "sk_path": "Softkey path",
           "title": {
             "heading": "Title of the card",
             "options": {
