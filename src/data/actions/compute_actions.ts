@@ -49,6 +49,7 @@ export function getIcon(type: string, data: any = undefined): string {
 export class ConxData {
     static SK: ListVariableOption[] = [];
     static CUES: ListVariableOption[] = [];
+    static RADIO: ListVariableOption[] = [];
 
     public static ProcessSK(msg: any) {
         let data: ListVariableOption[] = [];
@@ -72,15 +73,21 @@ export class ConxData {
         let data: ListVariableOption[] = [];
         const payload = msg?.payload;
         if (payload) {
-            for (let k in payload) {
+            for (let k in payload)
                 data.push({ value: k, icon: getIcon("cueplay"), name: k });
-            }
         }
 
         this.CUES = data;
     }
-    public static ProcessRadio(_msg: any) {
-        // console.log(msg);
+    public static ProcessRadio(msg: any) {
+        let data: ListVariableOption[] = [];
+        const payload = msg?.payload;
+        if (payload) {
+            for (let k in payload)
+                data.push({ value: k, icon: "mdi:radiobox-blank", name: k });
+        }
+
+        this.RADIO = data;
     }
 }
 
@@ -140,7 +147,7 @@ export function computeActions(entity_id: string | string[], hass: HomeAssistant
                 action = {
                     ...action,
                     variables: {
-                        name: { type: EVariableType.Text, name: '', multiline: false, optional: false },
+                        name: { type: EVariableType.List, name: '', options: ConxData.RADIO },
                         value: { type: EVariableType.Text, name: '', multiline: false, optional: false },
                     },
                     icon: 'mdi:radiobox-marked',
