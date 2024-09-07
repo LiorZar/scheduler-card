@@ -4,12 +4,12 @@ import { html, TemplateResult } from 'lit';
 import { DialogParams } from '../components/generic-dialog';
 import { ProvideHassElement, showDialog } from './custom_dialog';
 
-export const fetchSK = (hass: HomeAssistant, path: string): Promise<any[]> =>
+export const fetchConx = (hass: HomeAssistant, unq: string, cmd: string, data: any): Promise<any[]> =>
     hass.connection.sendMessagePromise({
         type: 'conx.cmd',
-        cmd: 'db.Get',
-        unq: path,
-        data: { path: path, create: false },
+        cmd: cmd,
+        unq: unq,
+        data: data,
     });
 
 export const fetchSchedules = (hass: HomeAssistant): Promise<Schedule[]> =>

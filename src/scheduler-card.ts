@@ -16,8 +16,8 @@ import {
 } from './helpers';
 import { ValidateConfig } from './config-validation';
 import { parseEntity } from './data/entities/parse_entity';
-import { deleteSchedule, fetchSK, fetchScheduleItem, fetchSchedules, handleError } from './data/websockets';
-import { SKData, computeActions } from './data/actions/compute_actions';
+import { deleteSchedule, fetchConx, fetchScheduleItem, fetchSchedules, handleError } from './data/websockets';
+import { ConxData, computeActions } from './data/actions/compute_actions';
 import { compareActions } from './data/actions/compare_actions';
 import { importAction } from './data/actions/import_action';
 import { entityFilter } from './data/entities/entity_filter';
@@ -190,7 +190,7 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
 
     public hassSubscribe(): Promise<UnsubscribeFunc>[] {
         this.loadSchedules();
-        this.loadSK();
+        this.loadConx();
         return [
             this.hass!.connection.subscribeMessage((ev: SchedulerEventData) => this.updateScheduleItem(ev), {
                 type: WebsocketEvent,
@@ -271,20 +271,49 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
                 this.connectionError = true;
             });
     }
-    private async loadSK(): Promise<void> {
-        //load all sk
+    private async loadConx(): Promise<void> {
+        this._loadSK();
+        this._loadCues();
+        this._loadRadio();
+    }
+
+    private async _loadSK(): Promise<void> {
         let path: string = this._config?.sk_path || 'sk';
         if ("sk" !== path.substr(0, 2))
             path = "sk/" + path;
 
-        fetchSK(this.hass!, path)
+        fetchConx(this.hass!, path, 'db.Get', { path: path, create: false })
             .then((respond: any) => {
-                SKData.Process(respond);
+                ConxData.ProcessSK(respond);
             }, (_error: any) => {
-                SKData.Process({});
+                ConxData.ProcessSK({});
             })
             .catch(_e => {
-                SKData.Process({});
+                ConxData.ProcessSK({});
+            });
+    }
+
+    private async _loadCues(): Promise<void> {
+        fetchConx(this.hass!, "cues", "db.Get", { path: "cues" })
+            .then((respond: any) => {
+                ConxData.ProcessCues(respond);
+            }, (_error: any) => {
+                ConxData.ProcessCues({});
+            })
+            .catch(_e => {
+                ConxData.ProcessCues({});
+            });
+    }
+
+    private async _loadRadio(): Promise<void> {
+        fetchConx(this.hass!, "radio", "db.Get", { path: "radio" })
+            .then((respond: any) => {
+                ConxData.ProcessRadio(respond);
+            }, (_error: any) => {
+                ConxData.ProcessRadio({});
+            })
+            .catch(_e => {
+                ConxData.ProcessRadio({});
             });
     }
 
@@ -300,7 +329,7 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
             const changedKeys = Object.keys(oldConfig).filter(e => oldConfig[e] !== this._config![e]);
             if (changedKeys.some(e => ['tags', 'discover_existing', 'sort_by', 'display_options'].includes(e))) {
                 (async () => await this.loadSchedules())();
-                (async () => await this.loadSK())();
+                (async () => await this.loadConx())();
             }
         }
         if (oldHass && changedProps.size == 1 && this.schedules)
@@ -659,7 +688,7 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
     _retryConnection() {
         setTimeout(async () => {
             await this.loadSchedules();
-            await this.loadSK();
+            await this.loadConx();
         }, 100);
         this.connectionError = false;
         this.requestUpdate();

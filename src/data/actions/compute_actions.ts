@@ -46,10 +46,11 @@ export function getIcon(type: string, data: any = undefined): string {
     }
     return "";
 }
-export class SKData {
+export class ConxData {
     static SK: ListVariableOption[] = [];
+    static CUES: ListVariableOption[] = [];
 
-    public static Process(msg: any) {
+    public static ProcessSK(msg: any) {
         let data: ListVariableOption[] = [];
         let root: string = msg.unq;
         if (!root.endsWith('/'))
@@ -66,6 +67,20 @@ export class SKData {
         }
 
         this.SK = data;
+    }
+    public static ProcessCues(msg: any) {
+        let data: ListVariableOption[] = [];
+        const payload = msg?.payload;
+        if (payload) {
+            for (let k in payload) {
+                data.push({ value: k, icon: getIcon("cueplay"), name: k });
+            }
+        }
+
+        this.CUES = data;
+    }
+    public static ProcessRadio(_msg: any) {
+        // console.log(msg);
     }
 }
 
@@ -96,7 +111,7 @@ export function computeActions(entity_id: string | string[], hass: HomeAssistant
                 action = {
                     ...action,
                     variables: {
-                        path: { type: EVariableType.List, name: '', options: SKData.SK },
+                        path: { type: EVariableType.List, name: '', options: ConxData.SK },
                     },
                     icon: 'mdi:play-circle-outline',
                 };
@@ -106,7 +121,7 @@ export function computeActions(entity_id: string | string[], hass: HomeAssistant
                 action = {
                     ...action,
                     variables: {
-                        name: { type: EVariableType.Text, name: '', multiline: false, optional: false },
+                        name: { type: EVariableType.List, name: '', options: ConxData.CUES },
                         transition: {
                             type: EVariableType.Level,
                             name: '',
