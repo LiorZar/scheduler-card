@@ -80,6 +80,7 @@ export class SchedulerEditorTime extends LitElement {
         });
         actions.sort(sortAlphabetically);
         this.actions = actions;
+        this.refreshTimeScheme();
     }
 
     shouldUpdate(changedProps: PropertyValues): boolean {
@@ -98,6 +99,7 @@ export class SchedulerEditorTime extends LitElement {
     _tabs = [ETimeTab.Scheme, ETimeTab.Periodic];
 
     @state() private _currTimeOp: string = "hour";
+    @state() private _currEvery: number = 7;
     @state() private _currStartTime: string = "00:00:00";
 
     private _updateStartTime(data: Partial<Timeslot>) {
@@ -116,9 +118,13 @@ export class SchedulerEditorTime extends LitElement {
         if (!checked) return;
         this._currTimeOp = value;
     }
+    private _handleEveryChange(ev: CustomEvent): void {
+        const value = (ev.target as HTMLInputElement).value;
+        this._currEvery = parseInt(value);
+
+    }
     private _applyPeriod(): void {
-        const everyTime = (this.shadowRoot!.querySelector("#everyTime") as HTMLInputElement).value;
-        const minutes = parseInt(everyTime) * ('hour' === this._currTimeOp ? 60 : 1);
+        const minutes = this._currEvery * ('hour' === this._currTimeOp ? 60 : 1);
         const seconds = minutes * 60;
         const timeslots = this.schedule.timeslots;
         const TS = timeslots.filter(e => e.actions.length)?.[0] || timeslots[0];
@@ -162,7 +168,36 @@ export class SchedulerEditorTime extends LitElement {
         }
         timeslots.length = tot;
     }
+    private refreshTimeScheme(): void {
+        const hass = this.hass!;
+        const timeslots = this.schedule.timeslots;
+        const count = timeslots.length;
+        const durations = timeslots.map(e => stringToTime(e.stop ? e.stop : "00:00:00", hass!) - stringToTime(e.start, hass!));
 
+        const frequencyMap: { [key: number]: number } = {};
+        durations.forEach(duration => { frequencyMap[duration] = (frequencyMap[duration] || 0) + 1; });
+        let mostFrequentValue: number = 0;
+        let maxFrequency = 0;
+
+        for (const [key, count] of Object.entries(frequencyMap)) {
+            if (count >= maxFrequency && Number(key) > mostFrequentValue) {
+                maxFrequency = count;
+                mostFrequentValue = Number(key);
+            }
+        }
+
+        if (mostFrequentValue % 3600 == 0) {
+            this._currTimeOp = "hour";
+            this._currEvery = mostFrequentValue / 3600;
+        } else {
+            this._currTimeOp = "minute";
+            this._currEvery = mostFrequentValue / 60;
+        }
+        if (durations[0] != mostFrequentValue)
+            this._currStartTime = timeslots[0].stop ? timeslots[0].stop : "00:00:00";
+        else
+            this._currStartTime = "00:00:00";
+    }
     render() {
         if (!this.hass || !this.config || !this.entities || !this.actions) return html``;
 
@@ -220,7 +255,7 @@ export class SchedulerEditorTime extends LitElement {
                             </div>
                             <div>
                                 <label>Every</label>
-                                <input type="number" id="everyTime" name="everyTime" value="1" />
+                                <input type="number" id="everyTime" name="everyTime" value=${this._currEvery} @change=${this._handleEveryChange} />
                                 <label>${'hour' === this._currTimeOp ? localize('ui.panel.time_picker.hours', getLocale(this.hass)) : localize('ui.panel.time_picker.minutes', getLocale(this.hass))}</label>
                             </div>
                         </div>
