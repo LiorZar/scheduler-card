@@ -1,6 +1,6 @@
 import { CardConfig } from './types';
 
-export const CARD_VERSION = 'v3.2.14';
+export const CARD_VERSION = 'v3.2.15';
 
 export const DefaultTimeStep = 10;
 
@@ -23,7 +23,7 @@ export enum ETabOptions {
 }
 export enum ETimeTab {
     Scheme = 'scheme',
-    Periodic = 'periodic'
+    Periodic = 'periodic',
 }
 
 export const DefaultCardConfig: CardConfig = {
@@ -44,7 +44,7 @@ export const DefaultCardConfig: CardConfig = {
     },
     tags: [],
     sort_by: ['relative-time', 'state'],
-    sk_path: 'sk'
+    sk_path: 'sk',
 };
 
 export const WebsocketEvent = 'scheduler_updated';

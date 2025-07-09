@@ -279,39 +279,47 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
 
     private async _loadSK(): Promise<void> {
         let path: string = this._config?.sk_path || 'sk';
-        if ("sk" !== path.substr(0, 2))
-            path = "sk/" + path;
+        if ('sk' !== path.substr(0, 2)) path = 'sk/' + path;
 
         fetchConx(this.hass!, path, 'db.Get', { path: path, create: false })
-            .then((respond: any) => {
-                ConxData.ProcessSK(respond);
-            }, (_error: any) => {
-                ConxData.ProcessSK({});
-            })
+            .then(
+                (respond: any) => {
+                    ConxData.ProcessSK(respond);
+                },
+                (_error: any) => {
+                    ConxData.ProcessSK({});
+                }
+            )
             .catch(_e => {
                 ConxData.ProcessSK({});
             });
     }
 
     private async _loadCues(): Promise<void> {
-        fetchConx(this.hass!, "cues", "db.Get", { path: "cues" })
-            .then((respond: any) => {
-                ConxData.ProcessCues(respond);
-            }, (_error: any) => {
-                ConxData.ProcessCues({});
-            })
+        fetchConx(this.hass!, 'cues', 'db.Get', { path: 'cues' })
+            .then(
+                (respond: any) => {
+                    ConxData.ProcessCues(respond);
+                },
+                (_error: any) => {
+                    ConxData.ProcessCues({});
+                }
+            )
             .catch(_e => {
                 ConxData.ProcessCues({});
             });
     }
 
     private async _loadRadio(): Promise<void> {
-        fetchConx(this.hass!, "radio", "db.Get", { path: "radio" })
-            .then((respond: any) => {
-                ConxData.ProcessRadio(respond);
-            }, (_error: any) => {
-                ConxData.ProcessRadio({});
-            })
+        fetchConx(this.hass!, 'radio', 'db.Get', { path: 'radio' })
+            .then(
+                (respond: any) => {
+                    ConxData.ProcessRadio(respond);
+                },
+                (_error: any) => {
+                    ConxData.ProcessRadio({});
+                }
+            )
             .catch(_e => {
                 ConxData.ProcessRadio({});
             });

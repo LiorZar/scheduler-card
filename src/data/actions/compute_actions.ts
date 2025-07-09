@@ -13,38 +13,61 @@ import { ConxDomain, NotifyDomain } from '../../const';
 
 export function getIcon(type: string, data: any = undefined): string {
     switch (type) {
-        case "rename": return "mdi:rename-box";
-        case "alias": return "mdi:camera-switch-outline";
-        case "add": return "mdi:tooltip-plus-outline";
-        case "up": return "mdi:arrow-up-bold";
-        case "inf": return "mdi:infinity";
-        case "seq": return "mdi:view-sequential-outline";
-        case "left": return "mdi:arrow-left-bold";
-        case "right": return "mdi:arrow-right-bold";
-        case "folder": return "mdi:folder";
-        case "delete": return "mdi:delete";
-        case "group": return "mdi:lightbulb-group";
-        case "light": return "mdi:lightning-bolt";
-        case "cueplay": return "mdi:play-box";
-        case "timelinestart": return "mdi:play-circle-outline";
-        case "timelinestop": return "mdi:stop-circle-outline";
-        case "timelinego": return "mdi:skip-next-circle-outline";
-        case "edit": return "mdi:pencil";
-        case "script":
-            if (!data || !data?.domain || !data?.service)
-                return "mdi:script-outline";
-            let scr: string = data.domain + "." + data.service;
+        case 'rename':
+            return 'mdi:rename-box';
+        case 'alias':
+            return 'mdi:camera-switch-outline';
+        case 'add':
+            return 'mdi:tooltip-plus-outline';
+        case 'up':
+            return 'mdi:arrow-up-bold';
+        case 'inf':
+            return 'mdi:infinity';
+        case 'seq':
+            return 'mdi:view-sequential-outline';
+        case 'left':
+            return 'mdi:arrow-left-bold';
+        case 'right':
+            return 'mdi:arrow-right-bold';
+        case 'folder':
+            return 'mdi:folder';
+        case 'delete':
+            return 'mdi:delete';
+        case 'group':
+            return 'mdi:lightbulb-group';
+        case 'light':
+            return 'mdi:lightning-bolt';
+        case 'cueplay':
+            return 'mdi:play-box';
+        case 'timelinestart':
+            return 'mdi:play-circle-outline';
+        case 'timelinestop':
+            return 'mdi:stop-circle-outline';
+        case 'timelinego':
+            return 'mdi:skip-next-circle-outline';
+        case 'edit':
+            return 'mdi:pencil';
+        case 'script':
+            if (!data || !data?.domain || !data?.service) return 'mdi:script-outline';
+            const scr: string = data.domain + '.' + data.service;
             switch (scr) {
-                case "conx.light": return "mdi:lightning-bolt";
-                case "conx.cueplay": return "mdi:play-box";
-                case "conx.cuestore": return "mdi:content-save-outline";
-                case "conx.timelinestart": return "mdi:play-circle-outline";
-                case "conx.timelinestop": return "mdi:stop-circle-outline";
-                case "conx.timelinego": return "mdi:skip-next-circle-outline";
-                default: return "mdi:map-marker-question";
+                case 'conx.light':
+                    return 'mdi:lightning-bolt';
+                case 'conx.cueplay':
+                    return 'mdi:play-box';
+                case 'conx.cuestore':
+                    return 'mdi:content-save-outline';
+                case 'conx.timelinestart':
+                    return 'mdi:play-circle-outline';
+                case 'conx.timelinestop':
+                    return 'mdi:stop-circle-outline';
+                case 'conx.timelinego':
+                    return 'mdi:skip-next-circle-outline';
+                default:
+                    return 'mdi:map-marker-question';
             }
     }
-    return "";
+    return '';
 }
 export class ConxData {
     static SK: ListVariableOption[] = [];
@@ -52,16 +75,14 @@ export class ConxData {
     static RADIO: ListVariableOption[] = [];
 
     public static ProcessSK(msg: any) {
-        let data: ListVariableOption[] = [];
+        const data: ListVariableOption[] = [];
         let root: string = msg.unq;
-        if (!root.endsWith('/'))
-            root += '/';
+        if (!root.endsWith('/')) root += '/';
         const payload = msg?.payload;
         if (payload) {
             for (const [k, v] of Object.entries(payload)) {
                 const V = v as any;
-                if (V?.type === 'folder')
-                    continue;
+                if (V?.type === 'folder') continue;
 
                 data.push({ value: root + k, icon: getIcon(V.type, V.data), name: k });
             }
@@ -70,27 +91,24 @@ export class ConxData {
         this.SK = data;
     }
     public static ProcessCues(msg: any) {
-        let data: ListVariableOption[] = [];
+        const data: ListVariableOption[] = [];
         const payload = msg?.payload;
         if (payload) {
-            for (let k in payload)
-                data.push({ value: k, icon: getIcon("cueplay"), name: k });
+            for (const k in payload) data.push({ value: k, icon: getIcon('cueplay'), name: k });
         }
 
         this.CUES = data;
     }
     public static ProcessRadio(msg: any) {
-        let data: ListVariableOption[] = [];
+        const data: ListVariableOption[] = [];
         const payload = msg?.payload;
         if (payload) {
-            for (let k in payload)
-                data.push({ value: k, icon: "mdi:radiobox-blank", name: k });
+            for (const k in payload) data.push({ value: k, icon: 'mdi:radiobox-blank', name: k });
         }
 
         this.RADIO = data;
     }
 }
-
 
 function parseString(str: string) {
     return str

@@ -52,7 +52,7 @@ export function showErrorDialog(
     const params: DialogParams = {
         title: hass.localize('state_badge.default.error'),
         description: error,
-        primaryButtonLabel: hass.localize('ui.dialogs.generic.ok'),
+        primaryButtonLabel: hass.localize('ui.common.ok'),
         confirm: () => { },
         cancel: () => { },
     };

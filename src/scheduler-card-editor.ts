@@ -31,7 +31,7 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
     tagOptions?: string[];
 
     @state()
-    private _cardTab = false;
+    private _cardTab = 0;
 
     @property()
     selectedDomain = '';
@@ -54,10 +54,14 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
         }
 
         return html`
-      <paper-tabs .selected=${this._cardTab ? 1 : 0} @iron-activate=${this._selectTab}>
-        <paper-tab>${localize('ui.panel.card_editor.tabs.entities', getLocale(this.hass))}</paper-tab>
-        <paper-tab>${localize('ui.panel.card_editor.tabs.other', getLocale(this.hass))}</paper-tab>
-      </paper-tabs>
+      <sl-tab-group .selected=${this._cardTab ? 1 : 0} @iron-activate=${this._selectTab}>
+        <sl-tab slot="nav" panel="0" .active=${this._cardTab === 0}>
+          ${localize('ui.panel.card_editor.tabs.entities', getLocale(this.hass))}
+        </sl-tab>
+        <sl-tab slot="nav" panel="0" .active=${this._cardTab === 1}>
+          ${localize('ui.panel.card_editor.tabs.other', getLocale(this.hass))}
+        </sl-tab>
+      </sl-tab-group>
 
       <div class="card-config">
         ${!this._cardTab
@@ -72,12 +76,12 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
             `
                 : html`
               <ha-textfield
-                      label=${localize('ui.panel.card_editor.fields.sk_path', getLocale(this.hass))}
-                      .value=${this._config.sk_path || 'sk'}
-                      @input=${(ev: Event) => {
+                label=${localize('ui.panel.card_editor.fields.sk_path', getLocale(this.hass))}
+                .value=${this._config.sk_path || 'sk'}
+                @input=${(ev: Event) => {
                         this._updateConfig({ sk_path: String((ev.target as HTMLInputElement).value) });
                     }}
-                    ></ha-textfield>
+              ></ha-textfield>
               <div class="header">${localize('ui.panel.card_editor.fields.title.heading', getLocale(this.hass))}</div>
               <button-group
                 .items=${[
@@ -326,7 +330,7 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
     }
 
     private _selectTab(ev: CustomEvent): void {
-        this._cardTab = ev.detail.selected === 1;
+        this._cardTab = parseInt(ev.detail.name);
     }
 
     private _updateConfig(changes: Partial<CardConfig>) {
@@ -528,14 +532,9 @@ export class SchedulerCardEditor extends LitElement implements LovelaceCardEdito
         return css`
       ${commonStyle}
 
-      paper-tabs {
-        --paper-tabs-selection-bar-color: var(--primary-color);
-        --paper-tab-ink: var(--primary-color);
-        text-transform: uppercase;
-        font-size: 0.875rem;
-      }
-      paper-tab.iron-selected {
-        color: var(--primary-color);
+      sl-tab {
+        flex: 1;
+        text-align: center;
       }
       div.row {
         display: flex;

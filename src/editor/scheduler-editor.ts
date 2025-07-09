@@ -101,13 +101,20 @@ export class SchedulerEditorDialog extends LitElement {
                 : localize('ui.panel.common.new_schedule', getLocale(this.hass))}
           </span>
         </ha-dialog-header>
-        <paper-tabs .selected=${this._tabs.indexOf(this._currTab)} @iron-activate=${this._handleTabChanged}>
+        <sl-tab-group @sl-tab-show=${this._handleTabChanged}>
           ${this._tabs.map(
                     tab => html`
-              <paper-tab ?disabled=${tab != ETabOptions.Entity && !this.schedule}>${tabLabel(tab)}</paper-tab>
+              <sl-tab
+                slot="nav"
+                ?disabled=${tab != ETabOptions.Entity && !this.schedule}
+                panel="${tab}"
+                .active=${this._currTab === tab}
+              >
+                ${tabLabel(tab)}
+              </sl-tab>
             `
                 )}
-        </paper-tabs>
+        </sl-tab-group>
         ${this._currTab == ETabOptions.Entity
                 ? html`
               <scheduler-editor-entity
@@ -175,10 +182,9 @@ export class SchedulerEditorDialog extends LitElement {
 
     private _handleTabChanged(ev: CustomEvent): void {
         const oldTab = this._currTab;
-        const newTab = this._tabs[ev.detail.selected] as ETabOptions;
+        const newTab = ev.detail.name as ETabOptions;
         if (newTab != ETabOptions.Time && !this.schedule) {
             ev.preventDefault();
-            (ev.target as any).activeIndex = 0;
             return;
         }
         if (newTab === oldTab) return;
@@ -282,8 +288,8 @@ export class SchedulerEditorDialog extends LitElement {
             const params: DialogParams = {
                 title: localize('ui.dialog.confirm_delete.title', getLocale(this.hass)),
                 description: localize('ui.dialog.confirm_delete.description', getLocale(this.hass)),
-                primaryButtonLabel: this.hass.localize('ui.dialogs.generic.ok'),
-                secondaryButtonLabel: this.hass.localize('ui.dialogs.generic.cancel'),
+                primaryButtonLabel: this.hass.localize('ui.common.ok'),
+                secondaryButtonLabel: this.hass.localize('ui.common.cancel'),
                 cancel: () => {
                     resolve(false);
                 },
@@ -314,14 +320,9 @@ export class SchedulerEditorDialog extends LitElement {
         return css`
       ${dialogStyle}
 
-      paper-tabs {
-        --paper-tabs-selection-bar-color: var(--primary-color);
-        --paper-tab-ink: var(--primary-color);
-        text-transform: uppercase;
-        font-size: 0.875rem;
-      }
-      paper-tab.iron-selected {
-        color: var(--primary-color);
+      sl-tab {
+        flex: 1;
+        text-align: center;
       }
     `;
     }

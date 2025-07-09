@@ -98,12 +98,12 @@ export class SchedulerEditorTime extends LitElement {
     @state() private _currTab: ETimeTab = ETimeTab.Scheme;
     _tabs = [ETimeTab.Scheme, ETimeTab.Periodic];
 
-    @state() private _currTimeOp: string = "hour";
-    @state() private _currEvery: number = 7;
-    @state() private _currStartTime: string = "00:00:00";
+    @state() private _currTimeOp = 'hour';
+    @state() private _currEvery = 7;
+    @state() private _currStartTime = '00:00:00';
 
     private _updateStartTime(data: Partial<Timeslot>) {
-        this._currStartTime = data.start || "00:00:00";
+        this._currStartTime = data.start || '00:00:00';
     }
 
     private _handleTabChanged(ev: CustomEvent): void {
@@ -121,14 +121,14 @@ export class SchedulerEditorTime extends LitElement {
     private _handleEveryChange(ev: CustomEvent): void {
         const value = (ev.target as HTMLInputElement).value;
         this._currEvery = parseInt(value);
-
     }
     private _applyPeriod(): void {
         const minutes = this._currEvery * ('hour' === this._currTimeOp ? 60 : 1);
         const seconds = minutes * 60;
         const timeslots = this.schedule.timeslots;
         const TS = timeslots.filter(e => e.actions.length)?.[0] || timeslots[0];
-        let tot = 0, t;
+        let tot = 0,
+            t;
 
         const time = stringToTime(this._currStartTime, this.hass!);
         if (time > 0) {
@@ -138,7 +138,7 @@ export class SchedulerEditorTime extends LitElement {
                 conditions: TS.conditions,
                 condition_type: TS.condition_type,
                 track_conditions: TS.track_conditions,
-                actions: []
+                actions: [],
             };
             ++tot;
         }
@@ -150,7 +150,7 @@ export class SchedulerEditorTime extends LitElement {
                 conditions: TS.conditions,
                 condition_type: TS.condition_type,
                 track_conditions: TS.track_conditions,
-                actions: TS.actions
+                actions: TS.actions,
             };
             timeslots[tot] = ts;
             ++tot;
@@ -162,7 +162,7 @@ export class SchedulerEditorTime extends LitElement {
                 conditions: TS.conditions,
                 condition_type: TS.condition_type,
                 track_conditions: TS.track_conditions,
-                actions: []
+                actions: [],
             };
             ++tot;
         }
@@ -172,11 +172,15 @@ export class SchedulerEditorTime extends LitElement {
         const hass = this.hass!;
         const timeslots = this.schedule.timeslots;
         const count = timeslots.length;
-        const durations = timeslots.map(e => stringToTime(e.stop ? e.stop : "00:00:00", hass!) - stringToTime(e.start, hass!));
+        const durations = timeslots.map(
+            e => stringToTime(e.stop ? e.stop : '00:00:00', hass!) - stringToTime(e.start, hass!)
+        );
 
         const frequencyMap: { [key: number]: number } = {};
-        durations.forEach(duration => { frequencyMap[duration] = (frequencyMap[duration] || 0) + 1; });
-        let mostFrequentValue: number = 0;
+        durations.forEach(duration => {
+            frequencyMap[duration] = (frequencyMap[duration] || 0) + 1;
+        });
+        let mostFrequentValue = 0;
         let maxFrequency = 0;
 
         for (const [key, count] of Object.entries(frequencyMap)) {
@@ -187,16 +191,14 @@ export class SchedulerEditorTime extends LitElement {
         }
 
         if (mostFrequentValue % 3600 == 0) {
-            this._currTimeOp = "hour";
+            this._currTimeOp = 'hour';
             this._currEvery = mostFrequentValue / 3600;
         } else {
-            this._currTimeOp = "minute";
+            this._currTimeOp = 'minute';
             this._currEvery = mostFrequentValue / 60;
         }
-        if (durations[0] != mostFrequentValue)
-            this._currStartTime = timeslots[0].stop ? timeslots[0].stop : "00:00:00";
-        else
-            this._currStartTime = "00:00:00";
+        if (durations[0] != mostFrequentValue) this._currStartTime = timeslots[0].stop ? timeslots[0].stop : '00:00:00';
+        else this._currStartTime = '00:00:00';
     }
     render() {
         if (!this.hass || !this.config || !this.entities || !this.actions) return html``;
@@ -228,49 +230,73 @@ export class SchedulerEditorTime extends LitElement {
                 : html`
               ${this.renderDays()}
               <paper-tabs .selected=${this._tabs.indexOf(this._currTab)} @iron-activate=${this._handleTabChanged}>
-                ${this._tabs.map(tab => html`<paper-tab>${tabLabel(tab)}</paper-tab>`)}
-              </paper-tabs>
-              ${this._currTab == ETimeTab.Scheme ?
+                ${this._tabs.map(
+                    tab =>
                         html`
-        
+                      <paper-tab>${tabLabel(tab)}</paper-tab>
+                    `
+                )}
+              </paper-tabs>
+              ${this._currTab == ETimeTab.Scheme
+                        ? html`
                     <timeslot-editor
-                        .hass=${this.hass}
-                        .actions=${this.actions}
-                        .slots=${this.schedule.timeslots}
-                        stepSize=${this.config.time_step || DefaultTimeStep}
-                        .large=${this.large}
-                        @update=${this.handlePlannerUpdate}
+                      .hass=${this.hass}
+                      .actions=${this.actions}
+                      .slots=${this.schedule.timeslots}
+                      stepSize=${this.config.time_step || DefaultTimeStep}
+                      .large=${this.large}
+                      @update=${this.handlePlannerUpdate}
                     >
                     </timeslot-editor>
-                ` : html`
+                  `
+                        : html`
                     <div class="outer">
+                      <div>
                         <div>
-                            <div>
-                                <ha-formfield label=${localize('ui.panel.time_picker.hourly', getLocale(this.hass))}>
-                                    <ha-radio name="time-option" value="hour" @change=${this._handleTimeOptionChange} ?checked=${this._currTimeOp === "hour"} />
-                                </ha-formfield>
-                                <ha-formfield label=${localize('ui.panel.time_picker.minutely', getLocale(this.hass))}>
-                                    <ha-radio name="time-option" value="minute" @change=${this._handleTimeOptionChange} ?checked=${this._currTimeOp === "minute"} />
-                                </ha-formfield>
-                            </div>
-                            <div>
-                                <label>Every</label>
-                                <input type="number" id="everyTime" name="everyTime" value=${this._currEvery} @change=${this._handleEveryChange} />
-                                <label>${'hour' === this._currTimeOp ? localize('ui.panel.time_picker.hours', getLocale(this.hass)) : localize('ui.panel.time_picker.minutes', getLocale(this.hass))}</label>
-                            </div>
+                          <ha-formfield label=${localize('ui.panel.time_picker.hourly', getLocale(this.hass))}>
+                            <ha-radio
+                              name="time-option"
+                              value="hour"
+                              @change=${this._handleTimeOptionChange}
+                              ?checked=${this._currTimeOp === 'hour'}
+                            />
+                          </ha-formfield>
+                          <ha-formfield label=${localize('ui.panel.time_picker.minutely', getLocale(this.hass))}>
+                            <ha-radio
+                              name="time-option"
+                              value="minute"
+                              @change=${this._handleTimeOptionChange}
+                              ?checked=${this._currTimeOp === 'minute'}
+                            />
+                          </ha-formfield>
                         </div>
-                        <time-picker
-                            .hass=${this.hass}
-                            .value=${this._currStartTime}
-                            stepSize=${this.config.time_step || DefaultTimeStep}
-                            @change=${(ev: Event) => this._updateStartTime({ start: (ev.target as HTMLInputElement).value })}
-                        >
-                        </time-picker>
-                        <mwc-button @click=${this._applyPeriod}>Apply</mwc-button>
+                        <div>
+                          <label>Every</label>
+                          <input
+                            type="number"
+                            id="everyTime"
+                            name="everyTime"
+                            value=${this._currEvery}
+                            @change=${this._handleEveryChange}
+                          />
+                          <label
+                            >${'hour' === this._currTimeOp
+                                ? localize('ui.panel.time_picker.hours', getLocale(this.hass))
+                                : localize('ui.panel.time_picker.minutes', getLocale(this.hass))}</label
+                          >
+                        </div>
+                      </div>
+                      <time-picker
+                        .hass=${this.hass}
+                        .value=${this._currStartTime}
+                        stepSize=${this.config.time_step || DefaultTimeStep}
+                        @change=${(ev: Event) =>
+                                this._updateStartTime({ start: (ev.target as HTMLInputElement).value })}
+                      >
+                      </time-picker>
+                      <mwc-button @click=${this._applyPeriod}>Apply</mwc-button>
                     </div>
-                `
-                    }
-
+                  `}
               ${this.renderMarkerOptions()} ${this.renderActions()} ${this.getVariableEditor()}
             `}
       </div>
@@ -353,24 +379,63 @@ export class SchedulerEditorTime extends LitElement {
             { value: EDayType.Weekend, name: localize('ui.components.date.day_types_short.weekend', getLocale(this.hass)) },
             { value: EDayType.Custom, name: localize('ui.components.date.day_types_short.choose', getLocale(this.hass)) },
         ];
-        let months = Array.from(Array(12).keys());
+        const months = Array.from(Array(12).keys());
         const MonthOptions = months.map(e =>
             Object({ value: monthArray[e].substr(0, 3), name: formatMonth(e, getLocale(this.hass!), true) })
         );
 
         const MonthTypeOptions = [
-            { value: EMonthType.Monthly, name: localize('ui.components.date.month_types_short.monthly', getLocale(this.hass)) },
+            {
+                value: EMonthType.Monthly,
+                name: localize('ui.components.date.month_types_short.monthly', getLocale(this.hass)),
+            },
             { value: EMonthType.Custom, name: localize('ui.components.date.month_types_short.choose', getLocale(this.hass)) },
         ];
 
-        let monthdays = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
-        const MonthDaysOptions = monthdays.map(e =>
-            Object({ value: e, name: e.toString() })
-        );
+        const monthdays = [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+        ];
+        const MonthDaysOptions = monthdays.map(e => Object({ value: e, name: e.toString() }));
 
         const MonthDaysTypeOptions = [
-            { value: EMonthDaysType.All, name: localize('ui.components.date.monthdays_types_short.all', getLocale(this.hass)) },
-            { value: EMonthDaysType.Custom, name: localize('ui.components.date.monthdays_types_short.choose', getLocale(this.hass)) },
+            {
+                value: EMonthDaysType.All,
+                name: localize('ui.components.date.monthdays_types_short.all', getLocale(this.hass)),
+            },
+            {
+                value: EMonthDaysType.Custom,
+                name: localize('ui.components.date.monthdays_types_short.choose', getLocale(this.hass)),
+            },
         ];
 
         return html`
@@ -392,7 +457,11 @@ export class SchedulerEditorTime extends LitElement {
           `
                 : ''}
       <div class="header">${localize('ui.components.date.monthdays_types_short.monthdays', getLocale(this.hass))}</div>
-      <button-group .items=${MonthDaysTypeOptions} value=${monthdaysType(this.schedule.monthdays)} @change=${this.selectMonthDays}>
+      <button-group
+        .items=${MonthDaysTypeOptions}
+        value=${monthdaysType(this.schedule.monthdays)}
+        @change=${this.selectMonthDays}
+      >
       </button-group>
       ${monthdaysType(this.schedule.monthdays) == EMonthDaysType.Custom
                 ? html`
