@@ -4,34 +4,34 @@ import { HomeAssistant } from 'custom-card-helpers';
 import { mdiClose } from '@mdi/js';
 
 export type DialogParams = {
-  title: string;
-  description: string | TemplateResult;
-  primaryButtonLabel: string;
-  secondaryButtonLabel?: string;
-  primaryButtonCritical?: boolean;
-  cancel: () => void;
-  confirm: () => void;
+    title: string;
+    description: string | TemplateResult;
+    primaryButtonLabel: string;
+    secondaryButtonLabel?: string;
+    primaryButtonCritical?: boolean;
+    cancel: () => void;
+    confirm: () => void;
 };
 
 @customElement('generic-dialog')
 export class GenericDialog extends LitElement {
-  @property({ attribute: false }) public hass!: HomeAssistant;
+    @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @state() private _params?: DialogParams;
+    @state() private _params?: DialogParams;
 
-  public async showDialog(params: DialogParams): Promise<void> {
-    this._params = params;
-    await this.updateComplete;
-  }
+    public async showDialog(params: DialogParams): Promise<void> {
+        this._params = params;
+        await this.updateComplete;
+    }
 
-  public async closeDialog() {
-    if (this._params) this._params.cancel();
-    this._params = undefined;
-  }
+    public async closeDialog() {
+        if (this._params) this._params.cancel();
+        this._params = undefined;
+    }
 
-  render() {
-    if (!this._params) return html``;
-    return html`
+    render() {
+        if (!this._params) return html``;
+        return html`
       <ha-dialog open .heading=${true} @closed=${this.closeDialog} @close-dialog=${this.closeDialog}>
         <ha-dialog-header slot="heading">
           <ha-icon-button
@@ -49,37 +49,37 @@ export class GenericDialog extends LitElement {
         </div>
 
         ${this._params.secondaryButtonLabel
-          ? html`
-              <mwc-button slot="primaryAction" @click=${this.cancelClick} dialogAction="close">
+                ? html`
+              <ha-button type="button" slot="primaryAction" @click=${this.cancelClick} dialogAction="close">
                 ${this._params.secondaryButtonLabel}
-              </mwc-button>
+              </ha-button>
             `
-          : ''}
-        <mwc-button
+                : ''}
+        <ha-button type="button"
           slot="secondaryAction"
           style="${this._params.primaryButtonCritical ? '--mdc-theme-primary: var(--error-color)' : ''}"
           @click=${this.confirmClick}
           dialogAction="close"
         >
           ${this._params.primaryButtonLabel}
-        </mwc-button>
+        </ha-button>
       </ha-dialog>
     `;
-  }
+    }
 
-  confirmClick() {
-    this._params!.confirm();
-  }
+    confirmClick() {
+        this._params!.confirm();
+    }
 
-  cancelClick() {
-    this._params!.cancel();
-  }
+    cancelClick() {
+        this._params!.cancel();
+    }
 
-  static get styles(): CSSResultGroup {
-    return css`
+    static get styles(): CSSResultGroup {
+        return css`
       div.wrapper {
         color: var(--primary-text-color);
       }
     `;
-  }
+    }
 }

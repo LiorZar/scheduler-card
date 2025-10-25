@@ -6,61 +6,60 @@ import { isDefined, isEqual } from '../helpers';
 import './scheduler-select';
 
 export type Option = {
-  value: string;
-  name: string;
-  icon?: string;
+    value: string;
+    name: string;
+    icon?: string;
 };
 
 @customElement('scheduler-selector')
 export class SchedulerSelector extends LitElement {
-  @property()
-  items: Option[] = [];
+    @property()
+    items: Option[] = [];
 
-  @property({ type: Array })
-  value: string[] = [];
+    @property({ type: Array })
+    value: string[] = [];
 
-  @property()
-  label = '';
+    @property()
+    label = '';
 
-  @property({ type: Boolean })
-  invalid = false;
+    @property({ type: Boolean })
+    invalid = false;
 
-  shouldUpdate(changedProps: PropertyValues) {
-    if (changedProps.get('items')) {
-      if (!isEqual(this.items, changedProps.get('items') as Option[])) this.firstUpdated();
+    shouldUpdate(changedProps: PropertyValues) {
+        if (changedProps.get('items')) {
+            if (!isEqual(this.items, changedProps.get('items') as Option[])) this.firstUpdated();
+        }
+        return true;
     }
-    return true;
-  }
 
-  protected firstUpdated() {
-    //remove items from selection which are not in the list (anymore)
-    if (this.value.some(e => !this.items.map(v => v.value).includes(e))) {
-      this.value = this.value.filter(e => this.items.map(v => v.value).includes(e));
-      fireEvent(this, 'value-changed', { value: this.value });
+    protected firstUpdated() {
+        //remove items from selection which are not in the list (anymore)
+        if (this.value.some(e => !this.items.map(v => v.value).includes(e))) {
+            this.value = this.value.filter(e => this.items.map(v => v.value).includes(e));
+            fireEvent(this, 'value-changed', { value: this.value });
+        }
     }
-  }
 
-  protected render(): TemplateResult {
-    return html`
+    protected render(): TemplateResult {
+        return html`
       <div class="chip-set">
         ${this.value.length
-          ? this.value
-              .map(val => this.items.find(e => e.value == val))
-              .filter(isDefined)
-              .map(
-                e =>
-                  html`
+                ? this.value
+                    .map(val => this.items.find(e => e.value == val))
+                    .filter(isDefined)
+                    .map(
+                        e =>
+                            html`
           <div class="chip">
             <span class="label">
               ${e.name}
             </span>            
             <ha-icon class="button" icon="mdi:close" @click=${() => this._removeClick(e.value)}>
             </ha-icon>
-            </mwc-icon-button>
           </div>
         `
-              )
-          : ''}
+                    )
+                : ''}
       </div>
 
       <scheduler-select
@@ -73,24 +72,24 @@ export class SchedulerSelector extends LitElement {
       >
       </scheduler-select>
     `;
-  }
+    }
 
-  private _removeClick(value: string) {
-    this.value = this.value.filter(e => e !== value);
-    fireEvent(this, 'value-changed', { value: this.value });
-  }
+    private _removeClick(value: string) {
+        this.value = this.value.filter(e => e !== value);
+        fireEvent(this, 'value-changed', { value: this.value });
+    }
 
-  private _addClick(ev: Event) {
-    ev.stopPropagation();
-    const target = ev.target as HTMLInputElement;
-    const value = target.value;
-    if (!this.value.includes(value)) this.value = [...this.value, value];
-    target.value = '';
-    fireEvent(this, 'value-changed', { value: [...this.value] });
-  }
+    private _addClick(ev: Event) {
+        ev.stopPropagation();
+        const target = ev.target as HTMLInputElement;
+        const value = target.value;
+        if (!this.value.includes(value)) this.value = [...this.value, value];
+        target.value = '';
+        fireEvent(this, 'value-changed', { value: [...this.value] });
+    }
 
-  static get styles(): CSSResultGroup {
-    return css`
+    static get styles(): CSSResultGroup {
+        return css`
       div.chip-set {
         margin: 0px -4px;
       }
@@ -137,5 +136,5 @@ export class SchedulerSelector extends LitElement {
         margin-right: -6px !important;
       }
     `;
-  }
+    }
 }

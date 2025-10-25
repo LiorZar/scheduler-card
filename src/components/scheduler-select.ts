@@ -7,81 +7,81 @@ import { isEqual, isDefined } from '../helpers';
 import { loadHaForm } from '../load-ha-form';
 
 export type Option = {
-  name: string;
-  description?: string;
-  value: string;
-  icon?: string;
+    name: string;
+    description?: string;
+    value: string;
+    icon?: string;
 };
 
 @customElement('scheduler-select')
 export class SchedulerSelect extends LitElement {
-  @property()
-  public label = '';
+    @property()
+    public label = '';
 
-  @property()
-  public value?: string;
+    @property()
+    public value?: string;
 
-  @property()
-  items: Option[] = [];
+    @property()
+    items: Option[] = [];
 
-  @property()
-  clearable = false;
+    @property()
+    clearable = false;
 
-  @property()
-  icons = false;
+    @property()
+    icons = false;
 
-  @property({ type: Boolean })
-  disabled = false;
+    @property({ type: Boolean })
+    disabled = false;
 
-  @state()
-  private _opened?: boolean;
+    @state()
+    private _opened?: boolean;
 
-  @property({ attribute: 'allow-custom-value', type: Boolean })
-  public allowCustomValue?: boolean = false;
+    @property({ attribute: 'allow-custom-value', type: Boolean })
+    public allowCustomValue?: boolean = false;
 
-  @property({ type: Boolean })
-  invalid = false;
+    @property({ type: Boolean })
+    invalid = false;
 
-  @query('vaadin-combo-box-light', true)
-  private _comboBox!: HTMLElement;
+    @query('vaadin-combo-box-light', true)
+    private _comboBox!: HTMLElement;
 
-  private _overlayMutationObserver?: MutationObserver;
+    private _overlayMutationObserver?: MutationObserver;
 
-  public disconnectedCallback() {
-    super.disconnectedCallback();
-    if (this._overlayMutationObserver) {
-      this._overlayMutationObserver.disconnect();
-      this._overlayMutationObserver = undefined;
+    public disconnectedCallback() {
+        super.disconnectedCallback();
+        if (this._overlayMutationObserver) {
+            this._overlayMutationObserver.disconnect();
+            this._overlayMutationObserver = undefined;
+        }
     }
-  }
 
-  public open() {
-    this.updateComplete.then(() => {
-      (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.open();
-    });
-  }
-
-  public focus() {
-    this.updateComplete.then(() => {
-      (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.inputElement?.focus();
-    });
-  }
-
-  shouldUpdate(changedProps: PropertyValues) {
-    if (changedProps.get('items')) {
-      if (!isEqual(this.items, changedProps.get('items') as Option[])) this.firstUpdated();
-      else if (changedProps.size == 1) return false;
+    public open() {
+        this.updateComplete.then(() => {
+            (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.open();
+        });
     }
-    return true;
-  }
 
-  protected firstUpdated() {
-    (async () => await loadHaForm())();
-    (this._comboBox as any).items = this.items;
-  }
+    public focus() {
+        this.updateComplete.then(() => {
+            (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.inputElement?.focus();
+        });
+    }
 
-  protected render(): TemplateResult {
-    return html`
+    shouldUpdate(changedProps: PropertyValues) {
+        if (changedProps.get('items')) {
+            if (!isEqual(this.items, changedProps.get('items') as Option[])) this.firstUpdated();
+            else if (changedProps.size == 1) return false;
+        }
+        return true;
+    }
+
+    protected firstUpdated() {
+        (async () => await loadHaForm())();
+        (this._comboBox as any).items = this.items;
+    }
+
+    protected render(): TemplateResult {
+        return html`
       <vaadin-combo-box-light
         item-value-path="value"
         item-id-path="value"
@@ -104,20 +104,20 @@ export class SchedulerSelect extends LitElement {
           ?invalid=${this.invalid}
         >
           ${isDefined(this._value) && this.items.find(e => e.value == this._value)
-            ? html`
+                ? html`
                 ${this.icons
-                  ? html`
+                        ? html`
                       <ha-icon slot="prefix" icon="${this.items.find(e => e.value == this._value)!.icon}"> </ha-icon>
                     `
-                  : ''}
+                        : ''}
                 ${this.clearable
-                  ? html`
+                        ? html`
                       <ha-icon-button slot="suffix" class="clear-button" @click=${this._clearValue} .path=${mdiClose}>
                       </ha-icon-button>
                     `
-                  : ''}
+                        : ''}
               `
-            : ''}
+                : ''}
         </ha-textfield>
         <ha-svg-icon
           class="toggle-button ${this.items.length ? '' : 'disabled'}"
@@ -126,97 +126,97 @@ export class SchedulerSelect extends LitElement {
         ></ha-svg-icon>
       </vaadin-combo-box-light>
     `;
-  }
+    }
 
-  private rowRenderer(root: HTMLElement, _owner, entry: { item: Option }) {
-    if (!root.firstElementChild)
-      root.innerHTML = `
-        <mwc-list-item>
+    private rowRenderer(root: HTMLElement, _owner, entry: { item: Option }) {
+        if (!root.firstElementChild)
+            root.innerHTML = `
+        <ha-list-item>
           <span class="name"><span>
-        </mwc-list-item>
+        </ha-list-item>
       `;
-    root.querySelector('.name')!.textContent = entry.item.name;
-  }
-
-  private _clearValue(ev: Event) {
-    ev.stopPropagation();
-    this._setValue('');
-  }
-
-  private get _value() {
-    return isDefined(this.value) ? this.value : '';
-  }
-
-  private _toggleOpen(ev: Event) {
-    if (!this.items.length) {
-      ev.stopPropagation();
-      return;
+        root.querySelector('.name')!.textContent = entry.item.name;
     }
-    if (this._opened) {
-      (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.inputElement?.blur();
-      ev.stopPropagation();
-    } else {
-      (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.inputElement?.focus();
+
+    private _clearValue(ev: Event) {
+        ev.stopPropagation();
+        this._setValue('');
     }
-  }
 
-  private _openedChanged(ev: CustomEvent) {
-    this._opened = ev.detail.value;
+    private get _value() {
+        return isDefined(this.value) ? this.value : '';
+    }
 
-    if (this._opened && 'MutationObserver' in window && !this._overlayMutationObserver) {
-      const overlay = document.querySelector<HTMLElement>('vaadin-combo-box-overlay');
+    private _toggleOpen(ev: Event) {
+        if (!this.items.length) {
+            ev.stopPropagation();
+            return;
+        }
+        if (this._opened) {
+            (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.inputElement?.blur();
+            ev.stopPropagation();
+        } else {
+            (this.shadowRoot?.querySelector('vaadin-combo-box-light') as any)?.inputElement?.focus();
+        }
+    }
 
-      if (!overlay) return;
+    private _openedChanged(ev: CustomEvent) {
+        this._opened = ev.detail.value;
 
-      this._overlayMutationObserver = new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-          if (
-            mutation.type === 'attributes' &&
-            mutation.attributeName === 'inert' &&
-            // @ts-expect-error
-            overlay.inert === true
-          ) {
-            // @ts-expect-error
-            overlay.inert = false;
-            this._overlayMutationObserver?.disconnect();
-            this._overlayMutationObserver = undefined;
-          } else if (mutation.type === 'childList') {
-            mutation.removedNodes.forEach(node => {
-              if (node.nodeName === 'VAADIN-COMBO-BOX-OVERLAY') {
-                this._overlayMutationObserver?.disconnect();
-                this._overlayMutationObserver = undefined;
-              }
+        if (this._opened && 'MutationObserver' in window && !this._overlayMutationObserver) {
+            const overlay = document.querySelector<HTMLElement>('vaadin-combo-box-overlay');
+
+            if (!overlay) return;
+
+            this._overlayMutationObserver = new MutationObserver(mutations => {
+                mutations.forEach(mutation => {
+                    if (
+                        mutation.type === 'attributes' &&
+                        mutation.attributeName === 'inert' &&
+                        // @ts-expect-error
+                        overlay.inert === true
+                    ) {
+                        // @ts-expect-error
+                        overlay.inert = false;
+                        this._overlayMutationObserver?.disconnect();
+                        this._overlayMutationObserver = undefined;
+                    } else if (mutation.type === 'childList') {
+                        mutation.removedNodes.forEach(node => {
+                            if (node.nodeName === 'VAADIN-COMBO-BOX-OVERLAY') {
+                                this._overlayMutationObserver?.disconnect();
+                                this._overlayMutationObserver = undefined;
+                            }
+                        });
+                    }
+                });
             });
-          }
-        });
-      });
 
-      this._overlayMutationObserver.observe(overlay, {
-        attributes: true,
-      });
-      this._overlayMutationObserver.observe(document.body, {
-        childList: true,
-      });
+            this._overlayMutationObserver.observe(overlay, {
+                attributes: true,
+            });
+            this._overlayMutationObserver.observe(document.body, {
+                childList: true,
+            });
+        }
     }
-  }
 
-  private _valueChanged(ev: CustomEvent) {
-    const newValue = ev.detail.value;
-    if (newValue !== this._value) {
-      this._setValue(newValue);
+    private _valueChanged(ev: CustomEvent) {
+        const newValue = ev.detail.value;
+        if (newValue !== this._value) {
+            this._setValue(newValue);
+        }
     }
-  }
 
-  private _setValue(value: string) {
-    this.value = value;
+    private _setValue(value: string) {
+        this.value = value;
 
-    setTimeout(() => {
-      fireEvent(this, 'value-changed', { value });
-    }, 0);
-  }
+        setTimeout(() => {
+            fireEvent(this, 'value-changed', { value });
+        }, 0);
+    }
 
-  static get styles(): CSSResultGroup {
-    return css`
+    static get styles(): CSSResultGroup {
+        return css`
       :host {
         display: block;
         width: 100%;
@@ -249,5 +249,5 @@ export class SchedulerSelect extends LitElement {
         color: var(--primary-color);
       }
     `;
-  }
+    }
 }

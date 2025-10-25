@@ -294,7 +294,7 @@ export class SchedulerEditorTime extends LitElement {
                                 this._updateStartTime({ start: (ev.target as HTMLInputElement).value })}
                       >
                       </time-picker>
-                      <mwc-button @click=${this._applyPeriod}>Apply</mwc-button>
+                      <ha-button type="button" @click=${this._applyPeriod}>Apply</ha-button>
                     </div>
                   `}
               ${this.renderMarkerOptions()} ${this.renderActions()} ${this.getVariableEditor()}
@@ -304,20 +304,20 @@ export class SchedulerEditorTime extends LitElement {
       <div class="buttons ${!this.editItem ? 'centered' : ''}">
         ${this.editItem
                 ? html`
-              <mwc-button
+              <ha-button type="button"
                 class="warning"
                 @click=${() => this.dispatchEvent(new CustomEvent('deleteClick', { detail: this.schedule }))}
               >
                 ${this.hass.localize('ui.common.delete')}
-              </mwc-button>
+              </ha-button>
             `
                 : ''}
-        <mwc-button
+        <ha-button type="button"
           @click=${() => this.dispatchEvent(new CustomEvent('saveClick', { detail: this.schedule }))}
           ?disabled=${!this.schedule.timeslots.filter(e => e.actions.length).length}
         >
           ${this.hass.localize('ui.common.save')}
-        </mwc-button>
+        </ha-button>
       </div>
     `;
     }

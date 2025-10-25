@@ -57,15 +57,93 @@ export const commonStyle = css`
       margin: 0px 8px;
       line-height: 24px;
     }
-    mwc-button.active {
+    /* Base transparent style: no background, only blue text */
+    ha-button {
+        background: transparent;
+        margin-right: 6px;
+        padding: 0;
+    }
+
+    /* The actual button shape and text */
+    ha-button::part(base),
+    ha-button::part(button) {
+        border-radius: 9999px;
+        min-width: 48px;
+        height: 32px;
+        padding: 0 12px;
+        background: transparent;
+        color: var(--primary-color);
+        border: 1px solid transparent;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    /* Hover: faint background, brighter text */
+    ha-button::part(base):hover,
+    ha-button::part(button):hover {
+        background: color-mix(in oklab, var(--primary-color) 12%, transparent);
+        color: var(--primary-color);
+    }
+
+    /* Focus ring */
+    ha-button:focus-visible::part(base),
+    ha-button:focus-visible::part(button) {
+        outline: none;
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary-color) 35%, transparent);
+    }
+
+    /* Disabled state */
+    ha-button[disabled]::part(base),
+    ha-button[disabled]::part(button) {
+        background: rgba(128,128,128,0.15);
+        color: rgba(255,255,255,0.5);
+        cursor: not-allowed;
+    }
+
+    /* Active / selected (filled color like pushbutton) */
+    ha-button.active::part(base),
+    ha-button[data-active="true"]::part(base),
+    ha-button[aria-pressed="true"]::part(base),
+    ha-button.active::part(button),
+    ha-button[data-active="true"]::part(button),
+    ha-button[aria-pressed="true"]::part(button) {
+        background: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+    }
+
+    /* Optional: alternate highlight color for special cases */
+    ha-button.warning::part(base),
+    ha-button.warning::part(button) {
+        background: var(--error-color);
+        color: var(--text-primary-color, #fff);
+    }
+
+    /* Selected orange variant (for monthly mode etc.) */
+    ha-button.selected::part(base),
+    ha-button.selected::part(button) {
+        background: var(--warning-color, orange);
+        color: var(--text-primary-color, #fff);
+    }
+
+    /* Text-style variant (like Cancel button) */
+    ha-button[appearance="text"]::part(base),
+    ha-button[appearance="text"]::part(button) {
+        background: transparent;
+        color: var(--primary-color);
+    }
+
+    /* Icon spacing inside buttons */
+    ha-button ha-icon {
+        margin-right: 11px;
+    }
+    ha-button.active {
       background: var(--primary-color);
       --mdc-theme-primary: var(--text-primary-color);
       border-radius: 4px;
     }      
-    mwc-button ha-icon {
+    ha-button ha-icon {
       margin-right: 11px;
     }
-    mwc-button.warning {
+    ha-button.warning {
       --mdc-theme-primary: var(--error-color);
     }
     div.checkbox-container {
@@ -146,8 +224,10 @@ export const dialogStyle = css`
       --ha-dialog-border-radius: 0px;
     }
   }
-  mwc-button.warning {
-    --mdc-theme-primary: var(--error-color);
+  ha-button.warning::part(base),
+  ha-button.warning::part(button) {
+    background: var(--error-color);
+    color: var(--text-primary-color, #fff);
   }
   .error {
     color: var(--error-color);
@@ -178,8 +258,11 @@ export const dialogStyle = css`
       --mdc-dialog-max-width: 90vw;
     }
   }
-  mwc-tab[disabled] {
-    --mdc-tab-text-label-color-default: var(--material-disabled-text-color);
+  ha-tab[disabled],
+    ha-tabs [disabled] {
+    color: var(--disabled-text-color);
     pointer-events: none;
-  }
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 `;

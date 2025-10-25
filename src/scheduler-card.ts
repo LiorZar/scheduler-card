@@ -401,12 +401,12 @@ export class SchedulerCard extends SubscribeMixin(LitElement) {
               <div class="card-actions">
                 ${!this.connectionError
                         ? html`
-                      <mwc-button @click=${this._addItemClick}>${this.hass.localize('ui.common.add')} </mwc-button>
+                      <ha-button type="button" @click=${this._addItemClick}>${this.hass.localize('ui.common.add')} </ha-button>
                     `
                         : html`
-                      <mwc-button @click=${this._retryConnection}
+                      <ha-button type="button" @click=${this._retryConnection}
                         >${this.hass.localize('ui.common.refresh')}
-                      </mwc-button>
+                      </ha-button>
                     `}
               </div>
             `

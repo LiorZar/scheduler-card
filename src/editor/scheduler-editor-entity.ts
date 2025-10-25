@@ -207,27 +207,26 @@ export class SchedulerEditorEntity extends LitElement {
       <div class="buttons ${!this.schedule || !this.editItem ? 'centered' : ''}">
         ${!this.schedule
                 ? html`
-              <mwc-button @click=${this.nextClick} ?disabled=${!this.selectedAction && !this.timeSchemeSelected}
-                >${this.hass.localize('ui.common.next')}</mwc-button
-              >
+              <ha-button type="button" @click=${this.nextClick} ?disabled=${!this.selectedAction && !this.timeSchemeSelected}
+                >${this.hass.localize('ui.common.next')}</ha-button>
             `
                 : html`
               ${this.editItem
                         ? html`
-                    <mwc-button
+                    <ha-button type="button"
                       class="warning"
                       @click=${() => this.dispatchEvent(new CustomEvent('deleteClick', { detail: this.schedule }))}
                     >
                       ${this.hass.localize('ui.common.delete')}
-                    </mwc-button>
+                    </ha-button>
                   `
                         : ''}
-              <mwc-button
+              <ha-button type="button"
                 @click=${() => this.dispatchEvent(new CustomEvent('saveClick', { detail: this.schedule }))}
                 ?disabled=${!this.schedule?.timeslots.filter(e => e.actions.length).length}
               >
                 ${this.hass.localize('ui.common.save')}
-              </mwc-button>
+              </ha-button>
             `}
       </div>
     `;
@@ -238,12 +237,12 @@ export class SchedulerEditorEntity extends LitElement {
         return html`
       <div class="header">${this.hass.localize('ui.panel.config.automation.editor.conditions.type.or.label')}</div>
       <div class="option-list">
-        <mwc-button
+        <ha-button type="button"
           class="${this.timeSchemeSelected ? ' active' : ''}"
           @click=${this.selectTimeScheme}>
           <ha-icon icon="${PrettyPrintIcon('chart-timeline')}" class="padded-right"></ha-icon>
           ${localize('ui.panel.entity_picker.make_scheme', getLocale(this.hass))}
-        </mwc-button>
+        </ha-button>
       </div>
     </div>
     `;
